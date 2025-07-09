@@ -1,0 +1,162 @@
+
+import React, { useState } from 'react';
+import { MessageCircle, Settings, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AgentPortal } from '@/components/AgentPortal';
+import { AgentChat } from '@/components/AgentChat';
+import { AdminPanel } from '@/components/AdminPanel';
+import { GroupPortal } from '@/components/GroupPortal';
+import { GroupChat } from '@/components/GroupChat';
+import { Agent, defaultAgents } from '@/types/agents';
+import { Group, defaultGroups } from '@/types/groups';
+import { UserProfile, defaultUserProfile } from '@/types/user';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+
+const Index = () => {
+  const [activeTab, setActiveTab] = useState<'portal' | 'chat' | 'admin' | 'groups' | 'group-chat'>('portal');
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
+  const [groups] = useLocalStorage<Group[]>('groups', defaultGroups);
+  const [userProfile] = useLocalStorage<UserProfile>('user-profile', defaultUserProfile);
+
+  const handleAgentSelect = (agent: Agent) => {
+    setSelectedAgent(agent);
+    setActiveTab('chat');
+  };
+
+  const handleBackToPortal = () => {
+    setSelectedAgent(null);
+    setActiveTab('portal');
+  };
+
+  const handleGroupSelect = (group: Group) => {
+    setSelectedGroup(group);
+    setActiveTab('group-chat');
+  };
+
+  const handleBackToGroups = () => {
+    setSelectedGroup(null);
+    setActiveTab('groups');
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'portal':
+        return <AgentPortal onAgentSelect={handleAgentSelect} />;
+      case 'chat':
+        if (selectedAgent) {
+          // Busca a versão mais atual do agente no localStorage
+          const currentAgent = agents.find(a => a.id === selectedAgent.id) || selectedAgent;
+          return <AgentChat agent={currentAgent} onBack={handleBackToPortal} userProfile={userProfile} />;
+        } else {
+          return <AgentPortal onAgentSelect={handleAgentSelect} />;
+        }
+      case 'groups':
+        return <GroupPortal onGroupSelect={handleGroupSelect} />;
+      case 'group-chat':
+        if (selectedGroup) {
+          // Busca a versão mais atual do grupo no localStorage
+          const currentGroup = groups.find(g => g.id === selectedGroup.id) || selectedGroup;
+          return <GroupChat group={currentGroup} onBack={handleBackToGroups} userProfile={userProfile} />;
+        } else {
+          return <GroupPortal onGroupSelect={handleGroupSelect} />;
+        }
+      case 'admin':
+        return <AdminPanel />;
+      default:
+        return <AgentPortal onAgentSelect={handleAgentSelect} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/lovable-uploads/719cf256-e78e-410a-ac5a-2f514a4b8d16.png" 
+                  alt="Chathy Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900 font-montserrat">Chathy</h1>
+                <p className="text-sm text-gray-500">Especialistas em IA para todas as suas necessidades</p>
+              </div>
+            </div>
+            
+            {/* Navigation */}
+            <nav className="flex space-x-1">
+              <Button
+                variant={activeTab === 'portal' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('portal')}
+                className="flex items-center space-x-2"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Agentes</span>
+              </Button>
+              
+              <Button
+                variant={activeTab === 'groups' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('groups')}
+                className="flex items-center space-x-2"
+              >
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Grupos</span>
+              </Button>
+              
+              {selectedAgent && (
+                <Button
+                  variant={activeTab === 'chat' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setActiveTab('chat')}
+                  className="flex items-center space-x-2"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  <span className="hidden sm:inline">Chat</span>
+                </Button>
+              )}
+
+              {selectedGroup && (
+                <Button
+                  variant={activeTab === 'group-chat' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setActiveTab('group-chat')}
+                  className="flex items-center space-x-2"
+                >
+                  <Users className="h-4 w-4" />
+                  <span className="hidden sm:inline">Grupo</span>
+                </Button>
+              )}
+              
+              <Button
+                variant={activeTab === 'admin' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('admin')}
+                className="flex items-center space-x-2"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">Admin</span>
+              </Button>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className={`${activeTab === 'chat' || activeTab === 'group-chat' ? 'h-[calc(100vh-5rem)]' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}`}>
+        <div className={`${activeTab === 'chat' || activeTab === 'group-chat' ? 'h-full' : 'h-[calc(100vh-12rem)]'}`}>
+          {renderContent()}
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default Index;

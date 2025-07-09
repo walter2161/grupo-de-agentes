@@ -1,0 +1,147 @@
+
+import { Agent } from '@/types/agents';
+import { UserProfile } from '@/types/user';
+
+export interface MistralMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
+class AgentService {
+  private apiKey = 'UEPqczZDK2ldyBmVYCJHJjIPZstU3WaJ';
+  private baseUrl = 'https://api.mistral.ai/v1/chat/completions';
+  private pixabayApiKey = '12712829-23e1034c69e0a7c6119bcaaec';
+  private pixabayBaseUrl = 'https://pixabay.com/api/';
+
+  private async searchPixabayImage(query: string): Promise<string | null> {
+    try {
+      const response = await fetch(
+        `${this.pixabayBaseUrl}?key=${this.pixabayApiKey}&q=${encodeURIComponent(query)}&image_type=photo&orientation=horizontal&min_width=400&min_height=300&per_page=3&safesearch=true`
+      );
+      
+      if (!response.ok) {
+        console.error('Erro na API do Pixabay:', response.status);
+        return null;
+      }
+      
+      const data = await response.json();
+      
+      if (data.hits && data.hits.length > 0) {
+        // Retorna a primeira imagem encontrada
+        return data.hits[0].webformatURL;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Erro ao buscar imagem no Pixabay:', error);
+      return null;
+    }
+  }
+
+  async getAgentResponse(
+    message: string, 
+    conversationHistory: MistralMessage[], 
+    agent: Agent,
+    userProfile?: UserProfile
+  ): Promise<string> {
+    if (!this.apiKey) {
+      throw new Error('Chave da API Mistral não configurada');
+    }
+
+    const userInfo = userProfile ? `
+INFORMAÇÕES DO USUÁRIO QUE VOCÊ ESTÁ ATENDENDO:
+Nome: ${userProfile.name}
+Bio: ${userProfile.bio || 'Não informado'}
+Email: ${userProfile.email || 'Não informado'}
+Adapte sua comunicação ao perfil do usuário e trate-o pelo nome sempre que apropriado.
+` : '';
+
+    const systemPrompt = `Você é ${agent.name}, ${agent.title}.
+
+${userInfo}
+
+SUA ESPECIALIDADE: ${agent.specialty}
+SUA EXPERIÊNCIA: ${agent.experience}
+SUA ABORDAGEM: ${agent.approach}
+SUA DESCRIÇÃO: ${agent.description}
+
+DIRETRIZES IMPORTANTES:
+${agent.guidelines}
+
+ESTILO DE PERSONALIDADE:
+${agent.personaStyle}
+
+CONHECIMENTO ESPECÍFICO:
+${agent.documentation}
+
+CAPACIDADES ESPECIAIS DE IMAGEM:
+- Você TEM ACESSO a um sistema de busca de imagens integrado
+- Quando o usuário pedir uma imagem, você PODE enviá-la usando: [ENVIAR_IMAGEM: descrição da imagem]
+- Use este formato exato quando quiser enviar uma imagem: [ENVIAR_IMAGEM: carro vermelho] ou [ENVIAR_IMAGEM: natureza]
+- O sistema irá buscar automaticamente uma imagem relevante baseada na sua descrição
+- SEMPRE use este formato quando o usuário solicitar uma imagem específica
+- Seja específico na descrição para obter melhores resultados
+
+INSTRUÇÕES:
+1. Responda sempre como ${agent.name}
+2. Use seu conhecimento especializado em ${agent.specialty}
+3. Mantenha o tom profissional, mas acolhedor
+4. Se o usuário tiver nome, use-o na conversa de forma natural
+5. Seja empático e compreensivo
+6. Forneça respostas práticas e úteis
+7. QUANDO solicitado uma imagem, use o formato [ENVIAR_IMAGEM: descrição]
+8. Se não souber algo específico, seja honesto sobre suas limitações
+
+Responda de forma natural e profissional:`;
+
+    try {
+      const response = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'mistral-small-latest',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...conversationHistory,
+            { role: 'user', content: message }
+          ],
+          max_tokens: 500,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro na API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      let responseContent = data.choices[0]?.message?.content || 'Desculpe, não consegui processar sua mensagem.';
+      
+      // Processa comandos de envio de imagem
+      const imageMatch = responseContent.match(/\[ENVIAR_IMAGEM:\s*([^\]]+)\]/);
+      if (imageMatch) {
+        const imageDescription = imageMatch[1].trim();
+        const imageUrl = await this.searchPixabayImage(imageDescription);
+        
+        if (imageUrl) {
+          // Remove o comando da resposta e adiciona a imagem
+          responseContent = responseContent.replace(imageMatch[0], '').trim();
+          responseContent += `\n\n[IMAGEM_ENVIADA:${imageUrl}]`;
+        } else {
+          // Se não encontrar imagem, informa o usuário
+          responseContent = responseContent.replace(imageMatch[0], 'Desculpe, não consegui encontrar uma imagem adequada para sua solicitação.').trim();
+        }
+      }
+      
+      return responseContent;
+    } catch (error) {
+      console.error('Erro ao chamar a API Mistral:', error);
+      throw error;
+    }
+  }
+}
+
+export const agentService = new AgentService();
