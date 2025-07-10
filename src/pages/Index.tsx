@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MessageCircle, Settings, Users } from 'lucide-react';
+import { MessageCircle, Settings, Users, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AgentPortal } from '@/components/AgentPortal';
 import { AgentChat } from '@/components/AgentChat';
@@ -11,14 +11,16 @@ import { Agent, defaultAgents } from '@/types/agents';
 import { Group, defaultGroups } from '@/types/groups';
 import { UserProfile, defaultUserProfile } from '@/types/user';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState<'portal' | 'chat' | 'admin' | 'groups' | 'group-chat'>('portal');
+  const [activeTab, setActiveTab] = useState<'portal' | 'chat' | 'config' | 'groups' | 'group-chat'>('portal');
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
   const [groups] = useLocalStorage<Group[]>('groups', defaultGroups);
   const [userProfile] = useLocalStorage<UserProfile>('user-profile', defaultUserProfile);
+  const { user, logout } = useAuth();
 
   const handleAgentSelect = (agent: Agent) => {
     setSelectedAgent(agent);
@@ -46,7 +48,6 @@ const Index = () => {
         return <AgentPortal onAgentSelect={handleAgentSelect} />;
       case 'chat':
         if (selectedAgent) {
-          // Busca a versão mais atual do agente no localStorage
           const currentAgent = agents.find(a => a.id === selectedAgent.id) || selectedAgent;
           return <AgentChat agent={currentAgent} onBack={handleBackToPortal} userProfile={userProfile} />;
         } else {
@@ -56,13 +57,12 @@ const Index = () => {
         return <GroupPortal onGroupSelect={handleGroupSelect} />;
       case 'group-chat':
         if (selectedGroup) {
-          // Busca a versão mais atual do grupo no localStorage
           const currentGroup = groups.find(g => g.id === selectedGroup.id) || selectedGroup;
           return <GroupChat group={currentGroup} onBack={handleBackToGroups} userProfile={userProfile} />;
         } else {
           return <GroupPortal onGroupSelect={handleGroupSelect} />;
         }
-      case 'admin':
+      case 'config':
         return <AdminPanel />;
       default:
         return <AgentPortal onAgentSelect={handleAgentSelect} />;
@@ -90,7 +90,7 @@ const Index = () => {
             </div>
             
             {/* Navigation */}
-            <nav className="flex space-x-1">
+            <div className="flex items-center space-x-1">
               <Button
                 variant={activeTab === 'portal' ? 'default' : 'ghost'}
                 size="sm"
@@ -136,15 +136,31 @@ const Index = () => {
               )}
               
               <Button
-                variant={activeTab === 'admin' ? 'default' : 'ghost'}
+                variant={activeTab === 'config' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setActiveTab('admin')}
+                onClick={() => setActiveTab('config')}
                 className="flex items-center space-x-2"
               >
                 <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">Admin</span>
+                <span className="hidden sm:inline">Config</span>
               </Button>
-            </nav>
+
+              {/* User info and logout */}
+              <div className="flex items-center space-x-2 ml-4 pl-4 border-l">
+                <span className="text-sm text-gray-600 hidden sm:inline">
+                  {user?.name || user?.email}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={logout}
+                  className="flex items-center space-x-1"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sair</span>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
