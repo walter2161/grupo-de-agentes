@@ -238,13 +238,13 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+              className={`max-w-lg lg:max-w-2xl px-4 py-3 rounded-lg ${
                 message.sender === 'user'
                   ? 'bg-blue-500 text-white'
                   : 'bg-white text-gray-800 shadow-md'
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              <p className="text-base whitespace-pre-wrap">{message.content}</p>
               
               {/* Exibe imagem enviada pelo agente */}
               {message.imageUrl && (
@@ -268,7 +268,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-white text-gray-800 shadow-md max-w-xs lg:max-w-md px-4 py-2 rounded-lg">
+            <div className="bg-white text-gray-800 shadow-md max-w-lg lg:max-w-2xl px-4 py-3 rounded-lg">
               <div className="flex space-x-1">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>

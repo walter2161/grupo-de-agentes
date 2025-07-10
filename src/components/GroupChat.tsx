@@ -208,7 +208,7 @@ Como podemos te ajudar hoje?`,
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+              className={`max-w-lg lg:max-w-2xl px-4 py-3 rounded-lg ${
                 message.sender === 'user'
                   ? 'bg-blue-500 text-white'
                   : 'bg-white text-gray-800 shadow-md'
@@ -229,7 +229,7 @@ Como podemos te ajudar hoje?`,
                   </span>
                 </div>
               )}
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              <p className="text-base whitespace-pre-wrap">{message.content}</p>
               <p className={`text-xs mt-1 ${
                 message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
               }`}>
@@ -241,7 +241,7 @@ Como podemos te ajudar hoje?`,
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-white text-gray-800 shadow-md max-w-xs lg:max-w-md px-4 py-2 rounded-lg">
+            <div className="bg-white text-gray-800 shadow-md max-w-lg lg:max-w-2xl px-4 py-3 rounded-lg">
               <div className="flex items-center space-x-2 mb-1">
                 <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
                 <span className="text-xs font-medium text-gray-500">Especialistas digitando...</span>
