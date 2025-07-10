@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { PasswordInput } from '@/components/PasswordInput';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mail, User, Eye, EyeOff } from 'lucide-react';
+import { Mail, User } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const Login: React.FC = () => {
@@ -169,14 +169,6 @@ export const Login: React.FC = () => {
                   </button>
                 </div>
               </form>
-
-              {isLoginMode && (
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-xs text-blue-700 font-medium mb-2">Conta padrão para teste:</p>
-                  <p className="text-xs text-blue-600">Email: walter@ledmkt.com</p>
-                  <p className="text-xs text-blue-600">Senha: 9, 7, 6, 4, 3, 1</p>
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>

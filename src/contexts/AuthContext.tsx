@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthContextType, defaultUser } from '@/types/auth';
+import { UserProfile, defaultUserProfile } from '@/types/user';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -25,9 +26,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Verificar se há uma sessão ativa
     const currentUser = localStorage.getItem('chathy-current-user');
     if (currentUser) {
-      setUser(JSON.parse(currentUser));
+      const userData = JSON.parse(currentUser);
+      setUser(userData);
+      
+      // Sincronizar perfil do usuário com os dados de autenticação
+      syncUserProfile(userData);
     }
   }, []);
+
+  const syncUserProfile = (userData: User) => {
+    const existingProfile = JSON.parse(localStorage.getItem('user-profile') || 'null');
+    
+    // Se não há perfil ou o perfil não corresponde ao usuário logado, criar/atualizar
+    if (!existingProfile || existingProfile.email !== userData.email) {
+      const userProfile: UserProfile = {
+        ...defaultUserProfile,
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        updatedAt: new Date()
+      };
+      localStorage.setItem('user-profile', JSON.stringify(userProfile));
+    }
+  };
 
   const login = async (email: string, password: string): Promise<boolean> => {
     const users: User[] = JSON.parse(localStorage.getItem('chathy-users') || '[]');
@@ -36,6 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (foundUser) {
       setUser(foundUser);
       localStorage.setItem('chathy-current-user', JSON.stringify(foundUser));
+      syncUserProfile(foundUser);
       return true;
     }
     return false;
@@ -63,12 +85,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     setUser(newUser);
     localStorage.setItem('chathy-current-user', JSON.stringify(newUser));
+    syncUserProfile(newUser);
     return true;
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('chathy-current-user');
+    // Manter o perfil do usuário para quando ele logar novamente
   };
 
   const value: AuthContextType = {
