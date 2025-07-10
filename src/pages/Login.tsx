@@ -73,10 +73,6 @@ export const Login: React.FC = () => {
         <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white">
           <div className="max-w-md text-center">
             <h1 className="text-4xl font-bold mb-6">Bem-vindo ao Chathy</h1>
-            <p className="text-xl opacity-90 leading-relaxed">
-              Conecte-se com especialistas em IA para todas as suas necessidades. 
-              Uma nova forma de interagir com inteligência artificial.
-            </p>
           </div>
         </div>
       </div>

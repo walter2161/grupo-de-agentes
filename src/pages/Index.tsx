@@ -85,7 +85,6 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900 font-montserrat">Chathy</h1>
-                <p className="text-sm text-gray-500">Especialistas em IA para todas as suas necessidades</p>
               </div>
             </div>
             
