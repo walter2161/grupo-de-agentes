@@ -29,6 +29,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [isProcessingAudio, setIsProcessingAudio] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -155,10 +156,16 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
         audioChunks.push(event.data);
       };
       
-      mediaRecorder.onstop = () => {
+      mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        setAudioBlob(audioBlob);
         stream.getTracks().forEach(track => track.stop());
+        
+        // Processa o áudio imediatamente para evitar duplicação
+        if (!isProcessingAudio) {
+          setIsProcessingAudio(true);
+          await sendAudioMessage(audioBlob);
+          setIsProcessingAudio(false);
+        }
       };
       
       mediaRecorderRef.current = mediaRecorder;
@@ -174,7 +181,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
       console.error('Erro ao iniciar gravação:', error);
       alert('Toque na tela primeiro e depois clique no microfone para gravar.');
     }
-  }, []);
+  }, [isProcessingAudio]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {
@@ -267,13 +274,26 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
     }
   }, [messages, agent.id, currentAgent, currentUserProfile, setMessages]);
 
-  // Simula conversão speech-to-text (substituir por serviço real)
+  // Simula conversão speech-to-text mais realista
   const convertSpeechToText = async (audioBase64: string): Promise<string> => {
-    // Em um app real, enviaria para API de speech-to-text (Google, Azure, etc.)
+    // Simula diferentes tipos de mensagens de áudio possíveis
+    const possibleTexts = [
+      "Olá, como você está hoje?",
+      "Preciso de ajuda com um problema",
+      "Obrigado pela resposta anterior",
+      "Você pode me explicar melhor isso?",
+      "Estou com dúvidas sobre este assunto",
+      "Perfeito, entendi agora",
+      "Qual seria a melhor abordagem?",
+      "Muito obrigado pela ajuda"
+    ];
+    
+    // Em um app real, enviaria o audioBase64 para uma API de speech-to-text
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve("Mensagem convertida do áudio");
-      }, 1000);
+        const randomText = possibleTexts[Math.floor(Math.random() * possibleTexts.length)];
+        resolve(randomText);
+      }, 1500); // Simula processamento mais demorado
     });
   };
 
@@ -310,12 +330,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
     }
   };
 
-  // Effect para processar áudio quando gravação termina
-  useEffect(() => {
-    if (audioBlob && !isRecording) {
-      sendAudioMessage(audioBlob);
-    }
-  }, [audioBlob, isRecording, sendAudioMessage]);
+  // Removido useEffect que causava duplicação
 
   // Cleanup
   useEffect(() => {
