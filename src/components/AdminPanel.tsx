@@ -25,7 +25,7 @@ export const AdminPanel = () => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [messages] = useLocalStorage<Message[]>('chat-history', []);
   const [protocols, setProtocols] = useLocalStorage<ConsultationProtocol[]>('consultation-protocols', []);
-  type TabType = 'dashboard' | 'user' | 'agents' | 'profile' | 'guidelines' | 'persona' | 'history' | 'docs' | 'protocols';
+  type TabType = 'dashboard' | 'profile' | 'change-password' | 'agents' | 'guidelines' | 'persona' | 'docs' | 'history' | 'protocols' | 'settings' | 'integrations' | 'delete' | 'terms' | 'logout';
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
 
   const handleSaveAgent = () => {
@@ -112,7 +112,7 @@ export const AdminPanel = () => {
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard />;
-      case 'user':
+      case 'profile':
         return <UserProfileSettings userProfile={userProfile} onSave={handleSaveUserProfile} />;
       case 'agents':
         return (

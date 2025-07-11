@@ -10,12 +10,19 @@ import {
   Download,
   Menu,
   X,
-  UserCog
+  UserCog,
+  Lock,
+  FileText,
+  Trash2,
+  LogOut,
+  ChevronDown,
+  ChevronRight,
+  Plug
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-type TabType = 'dashboard' | 'user' | 'agents' | 'profile' | 'guidelines' | 'persona' | 'history' | 'docs' | 'protocols';
+type TabType = 'dashboard' | 'profile' | 'change-password' | 'agents' | 'guidelines' | 'persona' | 'docs' | 'history' | 'protocols' | 'settings' | 'integrations' | 'delete' | 'terms' | 'logout';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -23,16 +30,69 @@ interface DashboardLayoutProps {
   onTabChange: (tab: TabType) => void;
 }
 
-const sidebarItems: Array<{ id: TabType; label: string; icon: any }> = [
-  { id: 'dashboard', label: 'Dashboard', icon: Home },
-  { id: 'user', label: 'Perfil Usuário', icon: UserCog },
-  { id: 'agents', label: 'Gerenciar Agentes', icon: User },
-  { id: 'profile', label: 'Editar Agente', icon: Settings },
-  { id: 'guidelines', label: 'Diretrizes', icon: BookOpen },
-  { id: 'persona', label: 'Persona', icon: MessageSquare },
-  { id: 'history', label: 'Histórico', icon: Download },
-  { id: 'docs', label: 'Documentação', icon: BookOpen },
-  { id: 'protocols', label: 'Protocolos', icon: Trophy },
+interface MenuGroup {
+  id: string;
+  label: string;
+  icon: any;
+  tab?: TabType;
+  isExpandable?: boolean;
+  children?: Array<{ id: TabType; label: string; icon: any }>;
+}
+
+const menuStructure: MenuGroup[] = [
+  { 
+    id: 'dashboard', 
+    label: 'Dashboard', 
+    icon: Home, 
+    tab: 'dashboard' 
+  },
+  { 
+    id: 'profile-group', 
+    label: 'Perfil', 
+    icon: UserCog, 
+    tab: 'profile',
+    isExpandable: true,
+    children: [
+      { id: 'change-password', label: 'Trocar senha', icon: Lock }
+    ]
+  },
+  { 
+    id: 'agents-group', 
+    label: 'Gerenciar Agentes', 
+    icon: Users, 
+    tab: 'agents',
+    isExpandable: true,
+    children: [
+      { id: 'guidelines', label: 'Diretrizes', icon: BookOpen },
+      { id: 'persona', label: 'Persona', icon: MessageSquare },
+      { id: 'docs', label: 'Documentação', icon: FileText },
+      { id: 'history', label: 'Histórico', icon: Download },
+      { id: 'protocols', label: 'Protocolos', icon: Trophy }
+    ]
+  },
+  { 
+    id: 'settings-group', 
+    label: 'Configurações', 
+    icon: Settings, 
+    tab: 'settings',
+    isExpandable: true,
+    children: [
+      { id: 'integrations', label: 'Integrações', icon: Plug },
+      { id: 'delete', label: 'Excluir', icon: Trash2 }
+    ]
+  },
+  { 
+    id: 'terms', 
+    label: 'Termos e Política de privacidade', 
+    icon: FileText, 
+    tab: 'terms' 
+  },
+  { 
+    id: 'logout', 
+    label: 'Sair', 
+    icon: LogOut, 
+    tab: 'logout' 
+  }
 ];
 
 // Lista de imagens de fundo randômicas
@@ -53,12 +113,44 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState('');
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(['agents-group']);
 
   // Seleciona uma imagem de fundo aleatória ao carregar o componente
   useEffect(() => {
     const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
     setBackgroundImage(randomImage);
   }, []);
+
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroups(prev => 
+      prev.includes(groupId) 
+        ? prev.filter(id => id !== groupId)
+        : [...prev, groupId]
+    );
+  };
+
+  const handleMenuClick = (tab: TabType, groupId?: string) => {
+    if (groupId && menuStructure.find(g => g.id === groupId)?.isExpandable) {
+      toggleGroup(groupId);
+    }
+    onTabChange(tab);
+    setSidebarOpen(false);
+  };
+
+  const getCurrentPageTitle = () => {
+    for (const group of menuStructure) {
+      if (group.tab === activeTab) {
+        return group.label;
+      }
+      if (group.children) {
+        const child = group.children.find(child => child.id === activeTab);
+        if (child) {
+          return child.label;
+        }
+      }
+    }
+    return 'Painel Administrativo';
+  };
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -112,27 +204,70 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         {/* Menu Items */}
         <nav className="p-2 space-y-1">
-          {sidebarItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
+          {menuStructure.map((group) => {
+            const Icon = group.icon;
+            const isMainActive = activeTab === group.tab;
+            const hasActiveChild = group.children?.some(child => child.id === activeTab);
+            const isGroupExpanded = expandedGroups.includes(group.id);
             
             return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  onTabChange(item.id);
-                  setSidebarOpen(false);
-                }}
-                className={cn(
-                  "w-full flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                  isActive 
-                    ? "bg-gray-800 text-white border-l-4 border-blue-500" 
-                    : "text-white hover:bg-gray-800 hover:text-white"
+              <div key={group.id}>
+                {/* Main Menu Item */}
+                <button
+                  onClick={() => {
+                    if (group.tab) {
+                      handleMenuClick(group.tab, group.id);
+                    } else if (group.isExpandable) {
+                      toggleGroup(group.id);
+                    }
+                  }}
+                  className={cn(
+                    "w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                    isMainActive || hasActiveChild
+                      ? "bg-gray-800 text-white border-l-4 border-blue-500" 
+                      : "text-white hover:bg-gray-800 hover:text-white"
+                  )}
+                >
+                  <div className="flex items-center space-x-3">
+                    <Icon className="h-4 w-4" />
+                    <span>{group.label}</span>
+                  </div>
+                  {group.isExpandable && (
+                    <div className="ml-auto">
+                      {isGroupExpanded ? 
+                        <ChevronDown className="h-4 w-4" /> : 
+                        <ChevronRight className="h-4 w-4" />
+                      }
+                    </div>
+                  )}
+                </button>
+
+                {/* Sub Menu Items */}
+                {group.children && isGroupExpanded && (
+                  <div className="ml-6 mt-1 space-y-1">
+                    {group.children.map((child) => {
+                      const ChildIcon = child.icon;
+                      const isChildActive = activeTab === child.id;
+                      
+                      return (
+                        <button
+                          key={child.id}
+                          onClick={() => handleMenuClick(child.id)}
+                          className={cn(
+                            "w-full flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                            isChildActive
+                              ? "bg-gray-700 text-white border-l-2 border-blue-400" 
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                          )}
+                        >
+                          <ChildIcon className="h-4 w-4" />
+                          <span>{child.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
-              >
-                <Icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </button>
+              </div>
             );
           })}
         </nav>
@@ -153,7 +288,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 <Menu className="h-4 w-4" />
               </Button>
               <h1 className="text-xl font-semibold text-foreground">
-                {sidebarItems.find(item => item.id === activeTab)?.label || 'Painel Administrativo'}
+                {getCurrentPageTitle()}
               </h1>
             </div>
           </div>
