@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageCircle, Settings, Users, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AgentPortal } from '@/components/AgentPortal';
@@ -69,10 +69,33 @@ const Index = () => {
     }
   };
 
+  // Seleciona uma imagem de fundo aleatória
+  const [backgroundImage, setBackgroundImage] = useState('');
+  useEffect(() => {
+    const backgroundImages = [
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop&crop=landscape',
+      'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1920&h=1080&fit=crop&crop=landscape',
+      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&h=1080&fit=crop&crop=landscape',
+      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&h=1080&fit=crop&crop=landscape',
+      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&h=1080&fit=crop&crop=landscape',
+    ];
+    const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+    setBackgroundImage(randomImage);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+    <div className="min-h-screen bg-background relative">
+      {/* Imagem de fundo como marca d'água para todas as páginas */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-[0.03] pointer-events-none z-0"
+        style={{ 
+          backgroundImage: `url(${backgroundImage})`,
+          filter: 'grayscale(100%)'
+        }}
+      />
+
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-background/95 backdrop-blur shadow-sm border-b border-border relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
@@ -84,7 +107,7 @@ const Index = () => {
                 />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900 font-montserrat">Chathy</h1>
+                <h1 className="text-xl font-bold text-foreground font-montserrat">Chathy</h1>
               </div>
             </div>
             
@@ -141,12 +164,12 @@ const Index = () => {
                 className="flex items-center space-x-2"
               >
                 <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">Config</span>
+                <span className="hidden sm:inline">Admin</span>
               </Button>
 
               {/* User info and logout */}
-              <div className="flex items-center space-x-2 ml-4 pl-4 border-l">
-                <span className="text-sm text-gray-600 hidden sm:inline">
+              <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-border">
+                <span className="text-sm text-muted-foreground hidden sm:inline">
                   {user?.name || user?.email}
                 </span>
                 <Button
@@ -165,8 +188,8 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className={`${activeTab === 'chat' || activeTab === 'group-chat' ? 'h-[calc(100vh-5rem)]' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}`}>
-        <div className={`${activeTab === 'chat' || activeTab === 'group-chat' ? 'h-full' : 'h-[calc(100vh-12rem)]'}`}>
+      <main className={`${activeTab === 'chat' || activeTab === 'group-chat' ? 'h-[calc(100vh-5rem)]' : ''} ${activeTab === 'config' ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'} relative z-10`}>
+        <div className={`${activeTab === 'chat' || activeTab === 'group-chat' ? 'h-full' : activeTab === 'config' ? 'min-h-[calc(100vh-5rem)]' : 'h-[calc(100vh-12rem)]'}`}>
           {renderContent()}
         </div>
       </main>
