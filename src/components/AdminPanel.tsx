@@ -18,6 +18,14 @@ import { UserProfileSettings } from './UserProfileSettings';
 import { generateAgentContent } from '@/utils/agentContentGenerator';
 import { DashboardLayout } from './DashboardLayout';
 import { Dashboard } from './Dashboard';
+import { ChangePassword } from './ChangePassword';
+import { Guidelines } from './Guidelines';
+import { PersonaManager } from './PersonaManager';
+import { Documentation } from './Documentation';
+import { SystemSettings } from './SystemSettings';
+import { Integrations } from './Integrations';
+import { DeleteAccount } from './DeleteAccount';
+import { TermsPrivacy } from './TermsPrivacy';
 
 export const AdminPanel = () => {
   const [agents, setAgents] = useLocalStorage<Agent[]>('agents', defaultAgents);
@@ -114,6 +122,26 @@ export const AdminPanel = () => {
         return <Dashboard />;
       case 'profile':
         return <UserProfileSettings userProfile={userProfile} onSave={handleSaveUserProfile} />;
+      case 'change-password':
+        return <ChangePassword />;
+      case 'guidelines':
+        return <Guidelines />;
+      case 'persona':
+        return <PersonaManager />;
+      case 'docs':
+        return <Documentation />;
+      case 'settings':
+        return <SystemSettings />;
+      case 'integrations':
+        return <Integrations />;
+      case 'delete':
+        return <DeleteAccount />;
+      case 'terms':
+        return <TermsPrivacy />;
+      case 'logout':
+        localStorage.clear();
+        window.location.href = '/';
+        return null;
       case 'agents':
         return (
           <div className="space-y-6">
