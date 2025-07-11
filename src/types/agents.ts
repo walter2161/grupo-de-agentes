@@ -22,6 +22,7 @@ export interface ChatMessage {
   timestamp: Date;
   agentId: string;
   imageUrl?: string;
+  audioUrl?: string;
 }
 
 export const defaultAgents: Agent[] = [
