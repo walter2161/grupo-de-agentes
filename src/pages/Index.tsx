@@ -73,14 +73,14 @@ const Index = () => {
   const [backgroundImage, setBackgroundImage] = useState('');
   useEffect(() => {
     const backgroundImages = [
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop&crop=landscape',
-      'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1920&h=1080&fit=crop&crop=landscape',
-      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&h=1080&fit=crop&crop=landscape',
-      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&h=1080&fit=crop&crop=landscape',
-      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&h=1080&fit=crop&crop=landscape',
-      'https://images.unsplash.com/photo-1506785803032-6bfd0c21e93a?w=1920&h=1080&fit=crop&crop=landscape',
-      'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1920&h=1080&fit=crop&crop=landscape',
-      'https://images.unsplash.com/photo-1517292987719-0369a794ec0f?w=1920&h=1080&fit=crop&crop=landscape'
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
+      'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
+      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
+      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
+      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
+      'https://images.unsplash.com/photo-1506785803032-6bfd0c21e93a?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
+      'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
+      'https://images.unsplash.com/photo-1517292987719-0369a794ec0f?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75'
     ];
     const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
     setBackgroundImage(randomImage);
@@ -88,12 +88,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Imagem de fundo como marca d'água para todas as páginas */}
+      {/* Imagem de fundo mais nítida para todas as páginas */}
       <div 
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-[0.03] pointer-events-none z-0"
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-50 pointer-events-none z-0"
         style={{ 
           backgroundImage: `url(${backgroundImage})`,
-          filter: 'grayscale(100%)'
+          filter: 'grayscale(20%)'
         }}
       />
 
