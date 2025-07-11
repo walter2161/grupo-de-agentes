@@ -257,14 +257,14 @@ export const Login: React.FC = () => {
                           onCheckedChange={(checked) => setTermsAccepted(checked === true)}
                           className="mt-1 flex-shrink-0"
                         />
-                        <label htmlFor="terms" className="text-sm text-gray-600 leading-relaxed cursor-pointer">
+                        <label htmlFor="terms" className="text-sm text-gray-600 leading-relaxed cursor-pointer text-left">
                           Aceito os <Dialog>
                             <DialogTrigger asChild>
                               <button 
                                 type="button" 
-                                className="text-blue-600 hover:text-blue-700 underline font-medium inline"
+                                className="text-blue-600 hover:text-blue-700 underline font-medium inline text-left"
                               >
-                                Termos de Uso e Política de Privacidade do Chathy
+                                Termos e Políticas do Chathy
                               </button>
                             </DialogTrigger>
                             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -275,7 +275,7 @@ export const Login: React.FC = () => {
                                     alt="Chathy" 
                                     className="w-6 h-6"
                                   />
-                                  Termos de Uso e Política de Privacidade - Chathy
+                                  Termos e Políticas - Chathy
                                 </DialogTitle>
                               </DialogHeader>
                               <div className="space-y-4 text-sm">

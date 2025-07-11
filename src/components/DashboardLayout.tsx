@@ -83,7 +83,7 @@ const menuStructure: MenuGroup[] = [
   },
   { 
     id: 'terms', 
-    label: 'Termos e Política de privacidade', 
+    label: 'Termos e Políticas', 
     icon: FileText, 
     tab: 'terms' 
   },
