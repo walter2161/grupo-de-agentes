@@ -16,6 +16,7 @@ import { Agent, defaultAgents } from '@/types/agents';
 import { UserProfile, defaultUserProfile } from '@/types/user';
 import { Message } from '@/types';
 import { AgentAvatar } from './AgentAvatar';
+import { UserLimitsStatus } from './UserLimitsStatus';
 import defaultUserAvatar from '@/assets/default-user-avatar.png';
 
 export const Dashboard = () => {
@@ -78,6 +79,9 @@ export const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* User Limits Status */}
+      <UserLimitsStatus />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

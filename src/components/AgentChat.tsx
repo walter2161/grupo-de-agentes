@@ -14,6 +14,8 @@ import { AgentAvatar } from '@/components/AgentAvatar';
 import { ImageUploader } from '@/components/ImageUploader';
 import { defaultAgents } from '@/types/agents';
 import { defaultUserProfile } from '@/types/user';
+import { checkUserLimits, DEFAULT_USER_LIMITS, AgentInteractionCount } from '@/types/userLimits';
+import { toast } from 'sonner';
 import * as Icons from 'lucide-react';
 
 interface AgentChatProps {
@@ -30,6 +32,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isProcessingAudio, setIsProcessingAudio] = useState(false);
+  const [agentInteractions, setAgentInteractions] = useLocalStorage<AgentInteractionCount[]>('agent-interactions', []);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -68,8 +71,38 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
     }
   }, [agent.id, currentAgent.name, currentAgent.title, currentAgent.description, messages.length, setMessages, currentUserProfile.name]);
 
+  // Função para atualizar interação do agente
+  const updateAgentInteraction = (agentId: string, timestamp: Date) => {
+    setAgentInteractions(prev => {
+      const existing = prev.find(i => i.agentId === agentId);
+      if (existing) {
+        return prev.map(i => 
+          i.agentId === agentId 
+            ? { ...i, lastInteraction: timestamp }
+            : i
+        );
+      } else {
+        return [...prev, {
+          agentId,
+          selfMessagesToday: 0,
+          randomQuestionsSent: 0,
+          lastInteraction: timestamp,
+          lastRandomQuestion: new Date(0),
+          lastSelfMessage: new Date(0)
+        }];
+      }
+    });
+  };
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+
+    // Valida o comprimento da mensagem
+    const validation = checkUserLimits.validateMessageLength(inputMessage);
+    if (!validation.valid) {
+      toast.error(validation.message);
+      return;
+    }
 
     console.log('Sending message:', inputMessage);
     
@@ -81,47 +114,66 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
       agentId: agent.id
     };
 
+    // Atualiza interação do usuário
+    updateAgentInteraction(agent.id, new Date());
+
     // Primeiro, adiciona a mensagem do usuário
     console.log('Adding user message to chat:', userMessage);
     const messagesWithUser = [...messages, userMessage];
-    setMessages(messagesWithUser);
+    
+    // Gerencia histórico limitado
+    const managedMessages = checkUserLimits.manageChatHistory(messagesWithUser);
+    setMessages(managedMessages);
     
     setInputMessage('');
     setIsLoading(true);
 
     try {
-      const conversationHistory: MistralMessage[] = messagesWithUser
+      const conversationHistory: MistralMessage[] = managedMessages
         .map(msg => ({
           role: msg.sender === 'user' ? 'user' : 'assistant',
           content: msg.content
         }));
 
-      const response = await agentService.getAgentResponse(inputMessage, conversationHistory, currentAgent, currentUserProfile);
-      
-      // Processa resposta para verificar se contém imagem
-      let finalContent = response;
-      let imageUrl = null;
-      
-      const imageMatch = response.match(/\[IMAGEM_ENVIADA:([^\]]+)\]/);
-      if (imageMatch) {
-        imageUrl = imageMatch[1];
-        finalContent = response.replace(imageMatch[0], '').trim();
-      }
+      // Adiciona data/hora atual ao contexto do agente
+      const currentDateTime = checkUserLimits.getCurrentDateTime();
+      const contextualInput = `[Data/Hora atual: ${currentDateTime}] ${inputMessage}`;
 
-      const agentMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        content: finalContent,
-        sender: 'agent',
-        timestamp: new Date(),
-        agentId: agent.id,
-        imageUrl: imageUrl || undefined
-      };
+      const response = await agentService.getAgentResponse(contextualInput, conversationHistory, currentAgent, currentUserProfile);
+      
+      // Divide a resposta do agente se necessário
+      const responseParts = checkUserLimits.splitLongAgentMessage(response);
+      
+      // Cria mensagens para cada parte da resposta
+      const agentMessages: ChatMessage[] = responseParts.map((part, index) => {
+        // Processa cada parte para verificar se contém imagem
+        let finalContent = part;
+        let imageUrl = null;
+        
+        const imageMatch = part.match(/\[IMAGEM_ENVIADA:([^\]]+)\]/);
+        if (imageMatch) {
+          imageUrl = imageMatch[1];
+          finalContent = part.replace(imageMatch[0], '').trim();
+        }
 
-      console.log('Adding agent response:', agentMessage);
-      // Agora adiciona a resposta do agente
-      const finalMessages = [...messagesWithUser, agentMessage];
+        return {
+          id: (Date.now() + index + 1).toString(),
+          content: finalContent,
+          sender: 'agent' as const,
+          timestamp: new Date(),
+          agentId: agent.id,
+          imageUrl: imageUrl || undefined
+        };
+      });
+
+      console.log('Adding agent responses:', agentMessages);
+      // Agora adiciona as respostas do agente
+      const finalMessages = [...managedMessages, ...agentMessages];
       console.log('Final messages array:', finalMessages);
-      setMessages(finalMessages);
+      
+      // Gerencia histórico novamente após adicionar respostas
+      const finalManagedMessages = checkUserLimits.manageChatHistory(finalMessages);
+      setMessages(finalManagedMessages);
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
       const errorMessage: ChatMessage = {
@@ -131,8 +183,8 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
         timestamp: new Date(),
         agentId: agent.id
       };
-      const finalMessages = [...messagesWithUser, errorMessage];
-      setMessages(finalMessages);
+      const finalMessages = [...managedMessages, errorMessage];
+      setMessages(checkUserLimits.manageChatHistory(finalMessages));
     } finally {
       setIsLoading(false);
     }
@@ -510,15 +562,21 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
       {/* Input Area */}
       <div className="p-2 border-t bg-white safe-area-inset-bottom">
         <div className="flex space-x-2 items-end">
-          <Textarea
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={isRecording ? "Gravando áudio..." : "Mensagem..."}
-            className="flex-1 resize-none min-h-[36px] max-h-[100px] text-sm rounded-full border-gray-300 px-4 py-2"
-            rows={1}
-            disabled={isRecording}
-          />
+          <div className="relative flex-1">
+            <Textarea
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={isRecording ? "Gravando áudio..." : `Mensagem... (máx: ${DEFAULT_USER_LIMITS.maxMessageLength} chars)`}
+              className="flex-1 resize-none min-h-[36px] max-h-[100px] text-sm rounded-full border-gray-300 px-4 py-2 pr-16"
+              rows={1}
+              disabled={isRecording}
+              maxLength={DEFAULT_USER_LIMITS.maxMessageLength}
+            />
+            <div className="absolute bottom-1 right-2 text-xs text-gray-400">
+              {inputMessage.length}/{DEFAULT_USER_LIMITS.maxMessageLength}
+            </div>
+          </div>
           <div className="flex space-x-1">
             {!isRecording && <EmojiPicker onEmojiSelect={handleEmojiSelect} />}
             

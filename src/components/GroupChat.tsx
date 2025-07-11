@@ -12,6 +12,8 @@ import { UserProfile } from '@/types/user';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { EmojiPicker } from '@/components/EmojiPicker';
 import { AgentAvatar } from '@/components/AgentAvatar';
+import { checkUserLimits, DEFAULT_USER_LIMITS, AgentInteractionCount } from '@/types/userLimits';
+import { toast } from 'sonner';
 import * as Icons from 'lucide-react';
 
 interface GroupChatProps {
@@ -25,6 +27,7 @@ export const GroupChat: React.FC<GroupChatProps> = ({ group, onBack, userProfile
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [agentInteractions, setAgentInteractions] = useLocalStorage<AgentInteractionCount[]>('group-agent-interactions', []);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
   
@@ -63,8 +66,42 @@ Como podemos te ajudar hoje?`,
     }
   }, [group.id, messages.length, groupAgents, userProfile.name]);
 
+  // Função para atualizar interação do agente
+  const updateAgentInteraction = (agentId: string, timestamp: Date) => {
+    setAgentInteractions(prev => {
+      const existing = prev.find(i => i.agentId === agentId);
+      if (existing) {
+        return prev.map(i => 
+          i.agentId === agentId 
+            ? { ...i, lastInteraction: timestamp }
+            : i
+        );
+      } else {
+        return [...prev, {
+          agentId,
+          selfMessagesToday: 0,
+          randomQuestionsSent: 0,
+          lastInteraction: timestamp,
+          lastRandomQuestion: new Date(0),
+          lastSelfMessage: new Date(0)
+        }];
+      }
+    });
+  };
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+
+    // Valida o comprimento da mensagem
+    const validation = checkUserLimits.validateMessageLength(inputMessage);
+    if (!validation.valid) {
+      toast.error(validation.message);
+      return;
+    }
+
+    // Atualiza interação dos agentes mencionados
+    const mentions = groupService.extractMentions(inputMessage, groupAgents);
+    mentions.forEach(agentId => updateAgentInteraction(agentId, new Date()));
 
     const userMessage: GroupMessage = {
       id: Date.now().toString(),
@@ -76,41 +113,59 @@ Como podemos te ajudar hoje?`,
       groupId: group.id
     };
 
-    const mentions = groupService.extractMentions(inputMessage, groupAgents);
     if (mentions.length > 0) {
       userMessage.mentions = mentions;
     }
 
     const messagesWithUser = [...messages, userMessage];
-    setMessages(messagesWithUser);
+    
+    // Gerencia histórico limitado
+    const managedMessages = checkUserLimits.manageChatHistory(messagesWithUser);
+    setMessages(managedMessages);
     setInputMessage('');
     setIsLoading(true);
 
     try {
+      // Adiciona data/hora atual ao contexto
+      const currentDateTime = checkUserLimits.getCurrentDateTime();
+      const contextualInput = `[Data/Hora atual: ${currentDateTime}] ${inputMessage}`;
+
       const { responses } = await groupService.getGroupResponse(
-        inputMessage,
-        messagesWithUser,
+        contextualInput,
+        managedMessages,
         group,
         agents,
         mentions,
         userProfile
       );
 
-      const agentMessages: GroupMessage[] = responses.map((response, index) => {
+      const agentMessages: GroupMessage[] = [];
+      
+      responses.forEach((response, index) => {
         const agent = agents.find(a => a.id === response.agentId);
-        return {
-          id: (Date.now() + index + 1).toString(),
-          content: response.content,
-          sender: 'agent' as const,
-          senderName: agent?.name || 'Agente',
-          senderAvatar: agent?.avatar,
-          agentId: response.agentId,
-          timestamp: new Date(),
-          groupId: group.id
-        };
+        
+        // Divide a resposta do agente se necessário
+        const responseParts = checkUserLimits.splitLongAgentMessage(response.content);
+        
+        responseParts.forEach((part, partIndex) => {
+          agentMessages.push({
+            id: (Date.now() + index + partIndex + 1).toString(),
+            content: part,
+            sender: 'agent' as const,
+            senderName: agent?.name || 'Agente',
+            senderAvatar: agent?.avatar,
+            agentId: response.agentId,
+            timestamp: new Date(),
+            groupId: group.id
+          });
+        });
       });
 
-      setMessages([...messagesWithUser, ...agentMessages]);
+      const finalMessages = [...managedMessages, ...agentMessages];
+      
+      // Gerencia histórico novamente após adicionar respostas
+      const finalManagedMessages = checkUserLimits.manageChatHistory(finalMessages);
+      setMessages(finalManagedMessages);
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
       const errorMessage: GroupMessage = {
@@ -121,7 +176,8 @@ Como podemos te ajudar hoje?`,
         timestamp: new Date(),
         groupId: group.id
       };
-      setMessages([...messagesWithUser, errorMessage]);
+      const errorMessages = [...managedMessages, errorMessage];
+      setMessages(checkUserLimits.manageChatHistory(errorMessages));
     } finally {
       setIsLoading(false);
     }
@@ -260,14 +316,20 @@ Como podemos te ajudar hoje?`,
       {/* Input Area */}
       <div className="p-3 border-t bg-white">
         <div className="flex space-x-2 items-end">
-          <Textarea
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Digite sua mensagem aqui... (use @ para mencionar especialistas)"
-            className="flex-1 resize-none min-h-[40px] max-h-[120px] text-sm"
-            rows={1}
-          />
+          <div className="relative flex-1">
+            <Textarea
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={`Digite sua mensagem... (máx: ${DEFAULT_USER_LIMITS.maxMessageLength} caracteres)`}
+              className="flex-1 resize-none min-h-[40px] max-h-[120px] text-sm pr-16"
+              rows={1}
+              maxLength={DEFAULT_USER_LIMITS.maxMessageLength}
+            />
+            <div className="absolute bottom-1 right-2 text-xs text-gray-400">
+              {inputMessage.length}/{DEFAULT_USER_LIMITS.maxMessageLength}
+            </div>
+          </div>
           <div className="flex space-x-1">
             <EmojiPicker onEmojiSelect={handleEmojiSelect} />
             <Button

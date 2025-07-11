@@ -23,13 +23,25 @@ class GroupService {
   ): Promise<{ responses: { agentId: string; content: string }[] }> {
     const groupAgents = agents.filter(agent => group.members.includes(agent.id));
     const responses: { agentId: string; content: string }[] = [];
+    
+    // Adiciona data/hora atual ao contexto das mensagens
+    const currentDateTime = new Date().toLocaleString('pt-BR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
 
     // Se há menções específicas, só esses agentes respondem
     if (mentions.length > 0) {
       const mentionedAgents = groupAgents.filter(agent => mentions.includes(agent.id));
       
       for (const agent of mentionedAgents) {
-        const response = await this.getAgentGroupResponse(message, conversationHistory, agent, group, groupAgents, userProfile);
+        const contextualMessage = message.includes('[Data/Hora atual:') ? message : `[Data/Hora atual: ${currentDateTime}] ${message}`;
+        const response = await this.getAgentGroupResponse(contextualMessage, conversationHistory, agent, group, groupAgents, userProfile);
         if (response) {
           responses.push({ agentId: agent.id, content: response });
         }
@@ -39,7 +51,8 @@ class GroupService {
       const shouldRespondAgent = await this.decideWhoShouldRespond(message, conversationHistory, groupAgents, userProfile);
       
       if (shouldRespondAgent) {
-        const response = await this.getAgentGroupResponse(message, conversationHistory, shouldRespondAgent, group, groupAgents, userProfile);
+        const contextualMessage = message.includes('[Data/Hora atual:') ? message : `[Data/Hora atual: ${currentDateTime}] ${message}`;
+        const response = await this.getAgentGroupResponse(contextualMessage, conversationHistory, shouldRespondAgent, group, groupAgents, userProfile);
         if (response) {
           responses.push({ agentId: shouldRespondAgent.id, content: response });
         }

@@ -1,22 +1,39 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Plus, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AgentCard } from './AgentCard';
 import { AgentFilters } from './AgentFilters';
 import { Agent } from '@/types/agents';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { defaultAgents } from '@/types/agents';
+import { checkUserLimits, DEFAULT_USER_LIMITS } from '@/types/userLimits';
+import { toast } from 'sonner';
 
 interface AgentPortalProps {
   onAgentSelect: (agent: Agent) => void;
+  onCreateAgent?: () => void;
 }
 
-export const AgentPortal: React.FC<AgentPortalProps> = ({ onAgentSelect }) => {
+export const AgentPortal: React.FC<AgentPortalProps> = ({ onAgentSelect, onCreateAgent }) => {
   const [agents, setAgents] = useLocalStorage<Agent[]>('agents', defaultAgents);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedExperience, setSelectedExperience] = useState('all');
+  
+  // Contabiliza apenas agentes criados pelo usuário (não os padrão)
+  const userCreatedAgents = agents.filter(agent => !defaultAgents.some(defaultAgent => defaultAgent.id === agent.id));
+  const canCreateMoreAgents = checkUserLimits.canCreateAgent(userCreatedAgents.length);
+
+  const handleCreateAgent = () => {
+    if (!canCreateMoreAgents) {
+      toast.error(`Limite atingido! Você pode criar no máximo ${DEFAULT_USER_LIMITS.maxAgents} agentes.`);
+      return;
+    }
+    onCreateAgent?.();
+  };
   
   // Assegura que os agentes padrão sejam carregados se não houver dados salvos
   useEffect(() => {
@@ -49,17 +66,41 @@ export const AgentPortal: React.FC<AgentPortalProps> = ({ onAgentSelect }) => {
 
   return (
     <div className="max-w-6xl mx-auto p-3 md:p-6">
-      {/* Search */}
+      {/* User limits info */}
+      {!canCreateMoreAgents && (
+        <Alert className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Você atingiu o limite de {DEFAULT_USER_LIMITS.maxAgents} agentes criados. 
+            Para criar mais agentes, considere fazer upgrade da sua conta.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Header with search and create button */}
       <div className="mb-4 md:mb-8">
-        <div className="relative max-w-md mx-auto">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            type="text"
-            placeholder="Buscar especialista..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-10 text-sm"
-          />
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div className="relative max-w-md flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Buscar especialista..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-10 text-sm"
+            />
+          </div>
+          
+          {onCreateAgent && (
+            <Button 
+              onClick={handleCreateAgent}
+              disabled={!canCreateMoreAgents}
+              className="whitespace-nowrap"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Criar Agente ({userCreatedAgents.length}/{DEFAULT_USER_LIMITS.maxAgents})
+            </Button>
+          )}
         </div>
       </div>
 
