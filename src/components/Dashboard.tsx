@@ -16,6 +16,7 @@ import { Agent, defaultAgents } from '@/types/agents';
 import { UserProfile, defaultUserProfile } from '@/types/user';
 import { Message } from '@/types';
 import { AgentAvatar } from './AgentAvatar';
+import defaultUserAvatar from '@/assets/default-user-avatar.png';
 
 export const Dashboard = () => {
   const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
@@ -66,7 +67,7 @@ export const Dashboard = () => {
         <div className="flex items-center space-x-4">
           <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20">
             <img 
-              src={userProfile.avatar || '/placeholder-avatar.png'} 
+              src={userProfile.avatar || defaultUserAvatar} 
               alt="Avatar do usuário"
               className="w-full h-full object-cover"
             />

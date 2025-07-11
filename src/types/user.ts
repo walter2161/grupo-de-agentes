@@ -16,7 +16,7 @@ export interface UserProfile {
 export const defaultUserProfile: UserProfile = {
   id: 'user-default',
   name: 'Usuário',
-  avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face',
+  avatar: '/src/assets/default-user-avatar.png',
   bio: 'Olá! Sou um usuário do Chathy.',
   preferences: {
     theme: 'light',
