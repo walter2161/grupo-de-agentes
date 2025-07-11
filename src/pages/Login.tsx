@@ -258,12 +258,11 @@ export const Login: React.FC = () => {
                           className="mt-1 flex-shrink-0"
                         />
                         <label htmlFor="terms" className="text-sm text-gray-600 leading-relaxed cursor-pointer">
-                          <span className="inline">Aceito os </span>
-                          <Dialog>
+                          Aceito os <Dialog>
                             <DialogTrigger asChild>
                               <button 
                                 type="button" 
-                                className="text-blue-600 hover:text-blue-700 underline font-medium inline break-words"
+                                className="text-blue-600 hover:text-blue-700 underline font-medium inline"
                               >
                                 Termos de Uso e Política de Privacidade do Chathy
                               </button>
@@ -332,8 +331,7 @@ export const Login: React.FC = () => {
                                 </div>
                               </div>
                             </DialogContent>
-                          </Dialog>
-                          <span className="inline"> e entendo que sou responsável por todas as minhas criações e interações na plataforma.</span>
+                          </Dialog> e entendo que sou responsável por todas as minhas criações e interações na plataforma.
                         </label>
                       </div>
                     </div>
