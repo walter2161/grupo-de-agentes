@@ -22,7 +22,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-type TabType = 'dashboard' | 'profile' | 'change-password' | 'agents' | 'guidelines' | 'persona' | 'docs' | 'history' | 'protocols' | 'settings' | 'integrations' | 'delete' | 'terms' | 'logout';
+type TabType = 'dashboard' | 'profile' | 'change-password' | 'agents' | 'edit-agent' | 'guidelines' | 'persona' | 'docs' | 'history' | 'protocols' | 'settings' | 'integrations' | 'delete' | 'terms' | 'logout';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -131,10 +131,19 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   const handleMenuClick = (tab: TabType, groupId?: string) => {
     if (groupId && menuStructure.find(g => g.id === groupId)?.isExpandable) {
+      // Se é um grupo expansível, apenas alterna a expansão
       toggleGroup(groupId);
+      // Só muda de aba se não for apenas para expandir
+      if (tab) {
+        onTabChange(tab);
+      }
+    } else {
+      // Se não é expansível, muda de aba e fecha sidebar
+      if (tab) {
+        onTabChange(tab);
+      }
+      setSidebarOpen(false);
     }
-    onTabChange(tab);
-    setSidebarOpen(false);
   };
 
   const getCurrentPageTitle = () => {

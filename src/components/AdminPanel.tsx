@@ -33,7 +33,7 @@ export const AdminPanel = () => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [messages] = useLocalStorage<Message[]>('chat-history', []);
   const [protocols, setProtocols] = useLocalStorage<ConsultationProtocol[]>('consultation-protocols', []);
-  type TabType = 'dashboard' | 'profile' | 'change-password' | 'agents' | 'guidelines' | 'persona' | 'docs' | 'history' | 'protocols' | 'settings' | 'integrations' | 'delete' | 'terms' | 'logout';
+  type TabType = 'dashboard' | 'profile' | 'change-password' | 'agents' | 'edit-agent' | 'guidelines' | 'persona' | 'docs' | 'history' | 'protocols' | 'settings' | 'integrations' | 'delete' | 'terms' | 'logout';
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
 
   const handleSaveAgent = () => {
@@ -71,7 +71,7 @@ export const AdminPanel = () => {
     
     setAgents([...agents, newAgent]);
     setSelectedAgent(newAgent);
-    setActiveTab('profile');
+    setActiveTab('edit-agent');
   };
 
   const handleDeleteAgent = (agentId: string) => {
@@ -168,7 +168,7 @@ export const AdminPanel = () => {
                             variant="outline"
                             onClick={() => {
                               setSelectedAgent(agent);
-                              setActiveTab('profile');
+                              setActiveTab('edit-agent');
                             }}
                           >
                             <Edit className="h-3 w-3 mr-1" />
@@ -192,7 +192,7 @@ export const AdminPanel = () => {
             </div>
           </div>
         );
-      case 'profile':
+      case 'edit-agent':
         if (!selectedAgent) {
           return (
             <div className="text-center py-8">
