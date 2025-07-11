@@ -81,11 +81,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed top-0 left-0 h-full w-64 bg-sidebar-background border-r border-sidebar-border transform transition-transform duration-300 ease-in-out z-30",
+        "fixed top-0 left-0 h-full w-64 bg-black border-r border-gray-800 transform transition-transform duration-300 ease-in-out z-30",
         sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Header da Sidebar */}
-        <div className="p-4 border-b border-sidebar-border bg-sidebar-background">
+        <div className="p-4 border-b border-gray-800 bg-black">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
@@ -95,7 +95,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   className="w-full h-full object-contain"
                 />
               </div>
-              <h2 className="text-lg font-bold text-sidebar-foreground font-montserrat">
+              <h2 className="text-lg font-bold text-white font-montserrat">
                 Chathy Admin
               </h2>
             </div>
@@ -103,7 +103,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent"
+              className="lg:hidden text-white hover:bg-gray-800"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -126,8 +126,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 className={cn(
                   "w-full flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                   isActive 
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground border-l-4 border-sidebar-primary" 
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    ? "bg-gray-800 text-white border-l-4 border-blue-500" 
+                    : "text-white hover:bg-gray-800 hover:text-white"
                 )}
               >
                 <Icon className="h-4 w-4" />
