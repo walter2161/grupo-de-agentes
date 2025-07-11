@@ -88,9 +88,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Imagem de fundo mais nítida para todas as páginas */}
+      {/* Imagem de fundo sutil para todas as páginas */}
       <div 
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-50 pointer-events-none z-0"
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-[0.15] pointer-events-none z-0"
         style={{ 
           backgroundImage: `url(${backgroundImage})`,
           filter: 'grayscale(20%)'
