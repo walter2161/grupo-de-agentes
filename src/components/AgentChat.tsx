@@ -210,57 +210,57 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className={`bg-gradient-to-r ${currentAgent.color} text-white p-4 border-b`}>
-        <div className="flex items-center space-x-3">
+      <div className={`bg-gradient-to-r ${currentAgent.color} text-white p-3 border-b`}>
+        <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={onBack}
-            className="text-white hover:bg-white/20 p-2"
+            className="text-white hover:bg-white/20 p-1.5"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-4 w-4" />
           </Button>
           
-          <AgentAvatar agent={currentAgent} size="md" />
+          <AgentAvatar agent={currentAgent} size="sm" />
           
-          <div>
-            <h2 className="text-lg font-semibold">{currentAgent.name}</h2>
-            <p className="text-white/90 text-sm">{currentAgent.title} • Online agora</p>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-base font-medium truncate">{currentAgent.name}</h2>
+            <p className="text-white/90 text-xs truncate">Online agora</p>
           </div>
         </div>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-2 space-y-2 bg-gray-50">
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-lg lg:max-w-2xl px-4 py-3 rounded-lg ${
+              className={`max-w-[85%] px-3 py-2 rounded-2xl ${
                 message.sender === 'user'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-white text-gray-800 shadow-md'
+                  ? 'bg-blue-500 text-white rounded-br-sm'
+                  : 'bg-white text-gray-800 shadow-sm border rounded-bl-sm'
               }`}
             >
-              <p className="text-base whitespace-pre-wrap">{message.content}</p>
+              <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
               
               {/* Exibe imagem enviada pelo agente */}
               {message.imageUrl && (
-                <div className="mt-2">
+                <div className="mt-1">
                   <img 
                     src={message.imageUrl} 
                     alt="Imagem enviada pelo agente" 
-                    className="w-full max-w-sm rounded-lg shadow-sm"
+                    className="w-full max-w-48 rounded-lg shadow-sm"
                   />
                 </div>
               )}
               
-              <p className={`text-xs mt-1 ${
+              <p className={`text-xs mt-1 opacity-70 ${
                 message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
               }`}>
-                {new Date(message.timestamp).toLocaleTimeString()}
+                {new Date(message.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
           </div>
@@ -268,11 +268,11 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-white text-gray-800 shadow-md max-w-lg lg:max-w-2xl px-4 py-3 rounded-lg">
+            <div className="bg-white text-gray-800 shadow-sm border max-w-[85%] px-3 py-2 rounded-2xl rounded-bl-sm">
               <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
+                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               </div>
             </div>
           </div>
@@ -281,14 +281,14 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
       </div>
 
       {/* Input Area */}
-      <div className="p-3 border-t bg-white">
+      <div className="p-2 border-t bg-white safe-area-inset-bottom">
         <div className="flex space-x-2 items-end">
           <Textarea
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Digite sua mensagem aqui..."
-            className="flex-1 resize-none min-h-[40px] max-h-[120px] text-sm"
+            placeholder="Mensagem..."
+            className="flex-1 resize-none min-h-[36px] max-h-[100px] text-sm rounded-full border-gray-300 px-4 py-2"
             rows={1}
           />
           <div className="flex space-x-1">
@@ -296,13 +296,13 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
             
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="px-2">
+                <Button variant="ghost" size="sm" className="px-2 h-8 w-8">
                   <Image className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-80 p-4">
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm">Enviar Imagem</h4>
+              <PopoverContent className="w-72 p-3">
+                <div className="space-y-2">
+                  <h4 className="font-medium text-xs">Enviar Imagem</h4>
                   <ImageUploader
                     onImageSelect={handleImageSelect}
                     onImageSend={handleImageSend}
@@ -313,9 +313,9 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
             
             <Button
               onClick={toggleRecording}
-              variant={isRecording ? "destructive" : "outline"}
+              variant={isRecording ? "destructive" : "ghost"}
               size="sm"
-              className="px-2"
+              className="px-2 h-8 w-8"
             >
               {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Button>
@@ -323,7 +323,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || isLoading}
               size="sm"
-              className="px-2"
+              className="px-2 h-8 w-8 bg-blue-500 hover:bg-blue-600"
             >
               <Send className="h-4 w-4" />
             </Button>

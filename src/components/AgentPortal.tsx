@@ -48,9 +48,9 @@ export const AgentPortal: React.FC<AgentPortalProps> = ({ onAgentSelect }) => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-3 md:p-6">
       {/* Search */}
-      <div className="mb-8">
+      <div className="mb-4 md:mb-8">
         <div className="relative max-w-md mx-auto">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
@@ -58,13 +58,13 @@ export const AgentPortal: React.FC<AgentPortalProps> = ({ onAgentSelect }) => {
             placeholder="Buscar especialista..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-10 text-sm"
           />
         </div>
       </div>
 
       {/* Filters */}
-      <div className="mb-8">
+      <div className="mb-4 md:mb-8">
         <AgentFilters
           selectedSpecialty={selectedSpecialty}
           selectedExperience={selectedExperience}
@@ -75,7 +75,7 @@ export const AgentPortal: React.FC<AgentPortalProps> = ({ onAgentSelect }) => {
       </div>
 
       {/* Agents Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredAgents.map((agent) => (
           <AgentCard
             key={agent.id}
