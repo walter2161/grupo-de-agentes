@@ -147,11 +147,48 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
   // Funções de áudio
   const startRecording = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
+      // Verifica se a API de mídia está disponível
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Seu navegador não suporta gravação de áudio.');
+        return;
+      }
+
+      // Verifica permissões primeiro
+      const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
       
+      if (permission.state === 'denied') {
+        alert('Permissão de microfone negada. Por favor, habilite nas configurações do navegador.');
+        return;
+      }
+
+      // Tenta acessar o microfone com configurações específicas para iOS
+      const constraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 44100
+        }
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      // Verifica se o stream está ativo
+      if (!stream.active) {
+        alert('Não foi possível ativar o microfone. Tente novamente.');
+        return;
+      }
+
+      // Detecta melhor formato para iOS Safari
+      let mimeType = 'audio/webm;codecs=opus';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/mp4';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'audio/wav';
+        }
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       const audioChunks: Blob[] = [];
       
       mediaRecorder.ondataavailable = (event) => {
@@ -161,13 +198,20 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
       };
       
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
+        const audioBlob = new Blob(audioChunks, { type: mimeType });
         setAudioBlob(audioBlob);
         stream.getTracks().forEach(track => track.stop());
       };
+
+      mediaRecorder.onerror = (event) => {
+        console.error('Erro no MediaRecorder:', event);
+        alert('Erro durante a gravação. Tente novamente.');
+        stream.getTracks().forEach(track => track.stop());
+        setIsRecording(false);
+      };
       
       mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start();
+      mediaRecorder.start(100); // Coleta dados a cada 100ms para melhor compatibilidade
       setIsRecording(true);
       setRecordingTime(0);
       
@@ -176,9 +220,22 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
         setRecordingTime(prev => prev + 1);
       }, 1000);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao iniciar gravação:', error);
-      alert('Erro ao acessar o microfone. Verifique as permissões.');
+      
+      let errorMessage = 'Erro ao acessar o microfone.';
+      
+      if (error.name === 'NotAllowedError') {
+        errorMessage = 'Permissão de microfone negada. Recarregue a página e permita o acesso ao microfone.';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = 'Nenhum microfone encontrado no dispositivo.';
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage = 'Gravação de áudio não suportada neste navegador.';
+      } else if (error.name === 'NotReadableError') {
+        errorMessage = 'Microfone está sendo usado por outro aplicativo.';
+      }
+      
+      alert(errorMessage);
     }
   }, []);
 
