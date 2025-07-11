@@ -17,7 +17,30 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState('');
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const [captchaQuestion, setCaptchaQuestion] = useState({ question: '', answer: 0 });
   const { login, register } = useAuth();
+
+  // Gera pergunta matemática simples para captcha
+  const generateCaptcha = useMemo(() => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    const operations = ['+', '-'];
+    const operation = operations[Math.floor(Math.random() * operations.length)];
+    
+    const question = `${num1} ${operation} ${num2}`;
+    const answer = operation === '+' ? num1 + num2 : num1 - num2;
+    
+    return { question, answer };
+  }, [isLoginMode]);
+
+  // Atualiza captcha quando muda para cadastro
+  React.useEffect(() => {
+    if (!isLoginMode) {
+      setCaptchaQuestion(generateCaptcha);
+      setCaptchaAnswer('');
+    }
+  }, [isLoginMode, generateCaptcha]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +66,10 @@ export const Login: React.FC = () => {
         }
         if (!termsAccepted) {
           toast.error('Você deve aceitar os termos de uso para continuar');
+          return;
+        }
+        if (parseInt(captchaAnswer) !== captchaQuestion.answer) {
+          toast.error('Resposta do captcha incorreta. Tente novamente.');
           return;
         }
         success = await register(email, name, password);
@@ -184,89 +211,114 @@ export const Login: React.FC = () => {
                 />
 
                 {!isLoginMode && (
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium text-gray-700">Termos de Uso</label>
-                    <RadioGroup value={termsAccepted} onValueChange={setTermsAccepted}>
-                      <div className="flex items-start space-x-2">
-                        <RadioGroupItem value="accepted" id="terms" className="mt-1" />
-                        <label htmlFor="terms" className="text-sm text-gray-600 leading-relaxed">
-                          Aceito os{' '}
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <button type="button" className="text-blue-600 hover:text-blue-700 underline font-medium">
-                                Termos de Uso e Política de Privacidade do Chathy
-                              </button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                              <DialogHeader>
-                                <DialogTitle className="flex items-center gap-2">
-                                  <img 
-                                    src="/lovable-uploads/719cf256-e78e-410a-ac5a-2f514a4b8d16.png" 
-                                    alt="Chathy" 
-                                    className="w-6 h-6"
-                                  />
-                                  Termos de Uso e Política de Privacidade - Chathy
-                                </DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4 text-sm">
-                                <section>
-                                  <h3 className="font-semibold text-base mb-2">1. Responsabilidades dos Usuários</h3>
-                                  <p>
-                                    Ao utilizar o Chathy, você concorda que é inteiramente responsável por todas as criações, 
-                                    conteúdos e interações que desenvolver com nossos agentes de IA. Isso inclui, mas não se 
-                                    limita a: conversas, textos, ideias, projetos e qualquer output gerado através da plataforma.
-                                  </p>
-                                </section>
-                                
-                                <section>
-                                  <h3 className="font-semibold text-base mb-2">2. Uso Responsável</h3>
-                                  <p>
-                                    Você se compromete a usar o Chathy de forma ética e legal, respeitando direitos autorais, 
-                                    não criando conteúdo prejudicial, ofensivo ou que viole leis aplicáveis. O Chathy não se 
-                                    responsabiliza pelo uso inadequado da plataforma.
-                                  </p>
-                                </section>
-
-                                <section>
-                                  <h3 className="font-semibold text-base mb-2">3. Privacidade e Dados</h3>
-                                  <p>
-                                    Respeitamos sua privacidade. Os dados são processados localmente sempre que possível. 
-                                    Conversas podem ser armazenadas temporariamente para melhorar a experiência, mas não 
-                                    compartilhamos informações pessoais com terceiros sem seu consentimento.
-                                  </p>
-                                </section>
-
-                                <section>
-                                  <h3 className="font-semibold text-base mb-2">4. Limitação de Responsabilidade</h3>
-                                  <p>
-                                    O Chathy fornece uma plataforma de interação com IA "como está". Não garantimos precisão 
-                                    total das respostas dos agentes e não nos responsabilizamos por decisões tomadas com base 
-                                    nas interações na plataforma.
-                                  </p>
-                                </section>
-
-                                <section>
-                                  <h3 className="font-semibold text-base mb-2">5. Propriedade Intelectual</h3>
-                                  <p>
-                                    Você mantém todos os direitos sobre o conteúdo que criar. O Chathy mantém direitos sobre 
-                                    sua tecnologia, design e agentes de IA. Ao usar nossos agentes, você tem licença para 
-                                    usar os outputs gerados.
-                                  </p>
-                                </section>
-
-                                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                                  <p className="text-xs text-gray-600">
-                                    Última atualização: {new Date().toLocaleDateString('pt-BR')}
-                                  </p>
-                                </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          {' '}e entendo que sou responsável por todas as minhas criações e interações na plataforma.
-                        </label>
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Verificação de Segurança</label>
+                      <div className="p-4 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center space-x-3">
+                          <div className="text-lg font-mono bg-white px-3 py-2 rounded border">
+                            {captchaQuestion.question} = ?
+                          </div>
+                          <Input
+                            type="number"
+                            value={captchaAnswer}
+                            onChange={(e) => setCaptchaAnswer(e.target.value)}
+                            placeholder="Resposta"
+                            className="w-24"
+                            required
+                            disabled={loading}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Resolva esta operação matemática para provar que você não é um robô
+                        </p>
                       </div>
-                    </RadioGroup>
-                  </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium text-gray-700">Termos de Uso</label>
+                      <RadioGroup value={termsAccepted} onValueChange={setTermsAccepted}>
+                        <div className="flex items-start space-x-2">
+                          <RadioGroupItem value="accepted" id="terms" className="mt-1 flex-shrink-0" />
+                          <label htmlFor="terms" className="text-sm text-gray-600 leading-relaxed">
+                            <span>Aceito os </span>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <button type="button" className="text-blue-600 hover:text-blue-700 underline font-medium inline">
+                                  Termos de Uso e Política de Privacidade do Chathy
+                                </button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogHeader>
+                                  <DialogTitle className="flex items-center gap-2">
+                                    <img 
+                                      src="/lovable-uploads/719cf256-e78e-410a-ac5a-2f514a4b8d16.png" 
+                                      alt="Chathy" 
+                                      className="w-6 h-6"
+                                    />
+                                    Termos de Uso e Política de Privacidade - Chathy
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4 text-sm">
+                                  <section>
+                                    <h3 className="font-semibold text-base mb-2">1. Responsabilidades dos Usuários</h3>
+                                    <p>
+                                      Ao utilizar o Chathy, você concorda que é inteiramente responsável por todas as criações, 
+                                      conteúdos e interações que desenvolver com nossos agentes de IA. Isso inclui, mas não se 
+                                      limita a: conversas, textos, ideias, projetos e qualquer output gerado através da plataforma.
+                                    </p>
+                                  </section>
+                                  
+                                  <section>
+                                    <h3 className="font-semibold text-base mb-2">2. Uso Responsável</h3>
+                                    <p>
+                                      Você se compromete a usar o Chathy de forma ética e legal, respeitando direitos autorais, 
+                                      não criando conteúdo prejudicial, ofensivo ou que viole leis aplicáveis. O Chathy não se 
+                                      responsabiliza pelo uso inadequado da plataforma.
+                                    </p>
+                                  </section>
+
+                                  <section>
+                                    <h3 className="font-semibold text-base mb-2">3. Privacidade e Dados</h3>
+                                    <p>
+                                      Respeitamos sua privacidade. Os dados são processados localmente sempre que possível. 
+                                      Conversas podem ser armazenadas temporariamente para melhorar a experiência, mas não 
+                                      compartilhamos informações pessoais com terceiros sem seu consentimento.
+                                    </p>
+                                  </section>
+
+                                  <section>
+                                    <h3 className="font-semibold text-base mb-2">4. Limitação de Responsabilidade</h3>
+                                    <p>
+                                      O Chathy fornece uma plataforma de interação com IA "como está". Não garantimos precisão 
+                                      total das respostas dos agentes e não nos responsabilizamos por decisões tomadas com base 
+                                      nas interações na plataforma.
+                                    </p>
+                                  </section>
+
+                                  <section>
+                                    <h3 className="font-semibold text-base mb-2">5. Propriedade Intelectual</h3>
+                                    <p>
+                                      Você mantém todos os direitos sobre o conteúdo que criar. O Chathy mantém direitos sobre 
+                                      sua tecnologia, design e agentes de IA. Ao usar nossos agentes, você tem licença para 
+                                      usar os outputs gerados.
+                                    </p>
+                                  </section>
+
+                                  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                                    <p className="text-xs text-gray-600">
+                                      Última atualização: {new Date().toLocaleDateString('pt-BR')}
+                                    </p>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            <span> e entendo que sou responsável por todas as minhas criações e interações na plataforma.</span>
+                          </label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  </>
                 )}
 
                 <Button
