@@ -78,10 +78,13 @@ const Index = () => {
       'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&h=1080&fit=crop&crop=landscape',
       'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&h=1080&fit=crop&crop=landscape',
       'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&h=1080&fit=crop&crop=landscape',
+      'https://images.unsplash.com/photo-1506785803032-6bfd0c21e93a?w=1920&h=1080&fit=crop&crop=landscape',
+      'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1920&h=1080&fit=crop&crop=landscape',
+      'https://images.unsplash.com/photo-1517292987719-0369a794ec0f?w=1920&h=1080&fit=crop&crop=landscape'
     ];
     const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
     setBackgroundImage(randomImage);
-  }, []);
+  }, [activeTab]); // Muda quando troca de aba/componente
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -98,7 +101,10 @@ const Index = () => {
       <header className="bg-background/95 backdrop-blur shadow-sm border-b border-border relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
+            <button 
+              onClick={() => setActiveTab('portal')}
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+            >
               <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
                 <img 
                   src="/lovable-uploads/719cf256-e78e-410a-ac5a-2f514a4b8d16.png" 
@@ -109,7 +115,7 @@ const Index = () => {
               <div>
                 <h1 className="text-xl font-bold text-foreground font-montserrat">Chathy</h1>
               </div>
-            </div>
+            </button>
             
             {/* Navigation */}
             <div className="flex items-center space-x-1">
