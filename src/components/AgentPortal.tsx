@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AgentCard } from './AgentCard';
 import { AgentFilters } from './AgentFilters';
 import { Agent } from '@/types/agents';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useUserStorage } from '@/hooks/useUserStorage';
 import { defaultAgents } from '@/types/agents';
 import { checkUserLimits, DEFAULT_USER_LIMITS } from '@/types/userLimits';
 import { toast } from 'sonner';
@@ -18,7 +18,7 @@ interface AgentPortalProps {
 }
 
 export const AgentPortal: React.FC<AgentPortalProps> = ({ onAgentSelect, onCreateAgent }) => {
-  const [agents, setAgents] = useLocalStorage<Agent[]>('agents', defaultAgents);
+  const [agents, setAgents] = useUserStorage<Agent[]>('agents', defaultAgents);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedExperience, setSelectedExperience] = useState('all');

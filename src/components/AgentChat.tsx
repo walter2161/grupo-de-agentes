@@ -8,7 +8,7 @@ import { agentService, MistralMessage } from '@/services/agentService';
 import { Agent } from '@/types/agents';
 import { ChatMessage } from '@/types/agents';
 import { UserProfile } from '@/types/user';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useUserStorage } from '@/hooks/useUserStorage';
 import { EmojiPicker } from '@/components/EmojiPicker';
 import { AgentAvatar } from '@/components/AgentAvatar';
 import { ImageUploader } from '@/components/ImageUploader';
@@ -25,21 +25,21 @@ interface AgentChatProps {
 }
 
 export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile }) => {
-  const [messages, setMessages] = useLocalStorage<ChatMessage[]>(`chat-history-${agent.id}`, []);
+  const [messages, setMessages] = useUserStorage<ChatMessage[]>(`chat-history-${agent.id}`, []);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isProcessingAudio, setIsProcessingAudio] = useState(false);
-  const [agentInteractions, setAgentInteractions] = useLocalStorage<AgentInteractionCount[]>('agent-interactions', []);
+  const [agentInteractions, setAgentInteractions] = useUserStorage<AgentInteractionCount[]>('agent-interactions', []);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Carrega as informações atualizadas do agente e do usuário do localStorage
-  const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
-  const [currentUserProfile] = useLocalStorage<UserProfile>('user-profile', defaultUserProfile);
+  const [agents] = useUserStorage<Agent[]>('agents', defaultAgents);
+  const [currentUserProfile] = useUserStorage<UserProfile>('user-profile', defaultUserProfile);
   const currentAgent = agents.find(a => a.id === agent.id) || agent;
 
   const IconComponent = Icons[agent.icon as keyof typeof Icons] as React.ComponentType<any>;

@@ -35,7 +35,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const syncUserProfile = (userData: User) => {
-    const existingProfile = JSON.parse(localStorage.getItem('user-profile') || 'null');
+    const userProfileKey = `${userData.id}-user-profile`;
+    const existingProfile = JSON.parse(localStorage.getItem(userProfileKey) || 'null');
     
     // Se não há perfil ou o perfil não corresponde ao usuário logado, criar/atualizar
     if (!existingProfile || existingProfile.email !== userData.email) {
@@ -46,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: userData.email,
         updatedAt: new Date()
       };
-      localStorage.setItem('user-profile', JSON.stringify(userProfile));
+      localStorage.setItem(userProfileKey, JSON.stringify(userProfile));
     }
   };
 
@@ -92,7 +93,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('chathy-current-user');
-    // Manter o perfil do usuário para quando ele logar novamente
+    // Os dados específicos do usuário permanecem no localStorage para quando ele logar novamente
+    // O novo hook useUserStorage irá carregar os dados corretos automaticamente
   };
 
   const value: AuthContextType = {

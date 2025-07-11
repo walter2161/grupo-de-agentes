@@ -3,12 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Users, MessageSquare, Clock, Zap } from 'lucide-react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useUserStorage } from '@/hooks/useUserStorage';
 import { Agent, defaultAgents } from '@/types/agents';
 import { DEFAULT_USER_LIMITS } from '@/types/userLimits';
 
 export const UserLimitsStatus: React.FC = () => {
-  const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
+  const [agents] = useUserStorage<Agent[]>('agents', defaultAgents);
   
   // Contabiliza apenas agentes criados pelo usuário
   const userCreatedAgents = agents.filter(agent => 

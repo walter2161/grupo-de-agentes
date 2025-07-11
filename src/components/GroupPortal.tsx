@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Group, defaultGroups } from '@/types/groups';
 import { Agent, defaultAgents } from '@/types/agents';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useUserStorage } from '@/hooks/useUserStorage';
 import { GroupCreator } from './GroupCreator';
 import { AgentAvatar } from './AgentAvatar';
 import * as Icons from 'lucide-react';
@@ -15,8 +15,8 @@ interface GroupPortalProps {
 }
 
 export const GroupPortal: React.FC<GroupPortalProps> = ({ onGroupSelect }) => {
-  const [groups, setGroups] = useLocalStorage<Group[]>('groups', defaultGroups);
-  const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
+  const [groups, setGroups] = useUserStorage<Group[]>('groups', defaultGroups);
+  const [agents] = useUserStorage<Agent[]>('agents', defaultAgents);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 

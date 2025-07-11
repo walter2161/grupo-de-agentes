@@ -11,7 +11,7 @@ import {
   Activity,
   Calendar
 } from 'lucide-react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useUserStorage } from '@/hooks/useUserStorage';
 import { Agent, defaultAgents } from '@/types/agents';
 import { UserProfile, defaultUserProfile } from '@/types/user';
 import { Message } from '@/types';
@@ -20,9 +20,9 @@ import { UserLimitsStatus } from './UserLimitsStatus';
 import defaultUserAvatar from '@/assets/default-user-avatar.png';
 
 export const Dashboard = () => {
-  const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
-  const [userProfile] = useLocalStorage<UserProfile>('user-profile', defaultUserProfile);
-  const [messages] = useLocalStorage<Message[]>('chat-history', []);
+  const [agents] = useUserStorage<Agent[]>('agents', defaultAgents);
+  const [userProfile] = useUserStorage<UserProfile>('user-profile', defaultUserProfile);
+  const [messages] = useUserStorage<Message[]>('chat-history', []);
 
   const activeAgents = agents.filter(agent => agent.isActive);
   const totalInteractions = messages.length;

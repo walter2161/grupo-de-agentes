@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Settings, User, MessageSquare, Download, BookOpen, Calendar, Trophy, Plus, Edit, Trash2, UserCog } from 'lucide-react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useUserStorage } from '@/hooks/useUserStorage';
 import { Message, ConsultationProtocol } from '@/types';
 import { Agent, defaultAgents } from '@/types/agents';
 import { UserProfile, defaultUserProfile } from '@/types/user';
@@ -28,11 +28,11 @@ import { DeleteAccount } from './DeleteAccount';
 import { TermsPrivacy } from './TermsPrivacy';
 
 export const AdminPanel = () => {
-  const [agents, setAgents] = useLocalStorage<Agent[]>('agents', defaultAgents);
-  const [userProfile, setUserProfile] = useLocalStorage<UserProfile>('user-profile', defaultUserProfile);
+  const [agents, setAgents] = useUserStorage<Agent[]>('agents', defaultAgents);
+  const [userProfile, setUserProfile] = useUserStorage<UserProfile>('user-profile', defaultUserProfile);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
-  const [messages] = useLocalStorage<Message[]>('chat-history', []);
-  const [protocols, setProtocols] = useLocalStorage<ConsultationProtocol[]>('consultation-protocols', []);
+  const [messages] = useUserStorage<Message[]>('chat-history', []);
+  const [protocols, setProtocols] = useUserStorage<ConsultationProtocol[]>('consultation-protocols', []);
   type TabType = 'dashboard' | 'profile' | 'change-password' | 'agents' | 'edit-agent' | 'guidelines' | 'persona' | 'docs' | 'history' | 'protocols' | 'settings' | 'integrations' | 'delete' | 'terms' | 'logout';
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
 

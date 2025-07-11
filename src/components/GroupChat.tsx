@@ -9,7 +9,7 @@ import { groupService } from '@/services/groupService';
 import { Group, GroupMessage } from '@/types/groups';
 import { Agent, defaultAgents } from '@/types/agents';
 import { UserProfile } from '@/types/user';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useUserStorage } from '@/hooks/useUserStorage';
 import { EmojiPicker } from '@/components/EmojiPicker';
 import { AgentAvatar } from '@/components/AgentAvatar';
 import { checkUserLimits, DEFAULT_USER_LIMITS, AgentInteractionCount } from '@/types/userLimits';
@@ -23,13 +23,13 @@ interface GroupChatProps {
 }
 
 export const GroupChat: React.FC<GroupChatProps> = ({ group, onBack, userProfile }) => {
-  const [messages, setMessages] = useLocalStorage<GroupMessage[]>(`group-chat-${group.id}`, []);
+  const [messages, setMessages] = useUserStorage<GroupMessage[]>(`group-chat-${group.id}`, []);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [agentInteractions, setAgentInteractions] = useLocalStorage<AgentInteractionCount[]>('group-agent-interactions', []);
+  const [agentInteractions, setAgentInteractions] = useUserStorage<AgentInteractionCount[]>('group-agent-interactions', []);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
+  const [agents] = useUserStorage<Agent[]>('agents', defaultAgents);
   
   const groupAgents = agents.filter(agent => group.members.includes(agent.id));
   const IconComponent = Icons[group.icon as keyof typeof Icons] as React.ComponentType<any>;
