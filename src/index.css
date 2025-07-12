@@ -100,7 +100,7 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     background-image: url('/lovable-uploads/8893e007-572d-497d-b9d4-bb8879a21c0a.png');
     background-repeat: repeat;
     background-size: 100px 100px;
