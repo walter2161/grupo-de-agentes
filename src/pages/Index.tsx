@@ -114,36 +114,10 @@ const Index = () => {
     }
   };
 
-  // Seleciona uma imagem de fundo aleatória
-  const [backgroundImage, setBackgroundImage] = useState('');
-  useEffect(() => {
-    const backgroundImages = [
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-      'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-      'https://images.unsplash.com/photo-1506785803032-6bfd0c21e93a?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-      'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-      'https://images.unsplash.com/photo-1517292987719-0369a794ec0f?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75'
-    ];
-    const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
-    setBackgroundImage(randomImage);
-  }, [activeTab]); // Muda quando troca de aba/componente
-
   return (
-    <div className="min-h-screen bg-background relative">
-      {/* Imagem de fundo sutil para todas as páginas */}
-      <div 
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-[0.15] pointer-events-none z-0"
-        style={{ 
-          backgroundImage: `url(${backgroundImage})`,
-          filter: 'grayscale(20%)'
-        }}
-      />
-
-      {/* Header */}
-      <header className="bg-background/95 backdrop-blur shadow-sm border-b border-border relative z-10">
+    <div className="min-h-screen relative">
+      {/* Removido sistema de imagens randômicas - usando apenas padrão rapport */}
+      <header className="bg-white/90 backdrop-blur shadow-sm border-b border-border relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <button 
