@@ -9,6 +9,7 @@ import { User } from 'lucide-react';
 import { UserProfile } from '@/types/user';
 import { useAuth } from '@/contexts/AuthContext';
 import { AvatarPicker } from './AvatarPicker';
+import { AvatarGenerator } from './AvatarGenerator';
 import { CustomImageUpload } from './CustomImageUpload';
 
 interface UserProfileSettingsProps {
@@ -108,6 +109,13 @@ export const UserProfileSettings: React.FC<UserProfileSettingsProps> = ({ userPr
                   <CustomImageUpload
                     currentImage={profile.avatar}
                     onImageSelect={(avatar) => setProfile({ ...profile, avatar })}
+                  />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Gerar com IA</h4>
+                  <AvatarGenerator
+                    currentAvatar={profile.avatar}
+                    onAvatarGenerated={(avatar) => setProfile({ ...profile, avatar })}
                   />
                 </div>
                 <div>

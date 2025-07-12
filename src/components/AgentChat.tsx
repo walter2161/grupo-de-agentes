@@ -167,10 +167,18 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
         let finalContent = part;
         let imageUrl = null;
         
-        const imageMatch = part.match(/\[IMAGEM_ENVIADA:([^\]]+)\]/);
-        if (imageMatch) {
-          imageUrl = imageMatch[1];
-          finalContent = part.replace(imageMatch[0], '').trim();
+        // Verifica se há imagem gerada com IA
+        const generatedImageMatch = part.match(/\[IMAGEM_GERADA:([^\]]+)\]/);
+        if (generatedImageMatch) {
+          imageUrl = generatedImageMatch[1];
+          finalContent = part.replace(generatedImageMatch[0], '').trim();
+        }
+        
+        // Verifica se há imagem enviada do Pixabay
+        const sentImageMatch = part.match(/\[IMAGEM_ENVIADA:([^\]]+)\]/);
+        if (sentImageMatch) {
+          imageUrl = sentImageMatch[1];
+          finalContent = part.replace(sentImageMatch[0], '').trim();
         }
 
         return {

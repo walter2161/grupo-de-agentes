@@ -1,6 +1,7 @@
 
 import { Agent } from '@/types/agents';
 import { UserProfile } from '@/types/user';
+import { googleAIImageService } from './googleAIImageService';
 
 export interface MistralMessage {
   role: 'user' | 'assistant' | 'system';
@@ -83,9 +84,11 @@ CONHECIMENTO ESPECÍFICO:
 ${agent.documentation}
 
 CAPACIDADES ESPECIAIS DE IMAGEM:
-- Você TEM ACESSO a um sistema de busca de imagens integrado
-- Quando o usuário pedir uma imagem, você PODE enviá-la usando: [ENVIAR_IMAGEM: descrição da imagem]
-- Use este formato exato quando quiser enviar uma imagem: [ENVIAR_IMAGEM: carro vermelho] ou [ENVIAR_IMAGEM: natureza]
+- Você TEM ACESSO a um sistema de geração de imagens com IA integrado
+- Quando o usuário pedir uma imagem criativa/personalizada, use: [GERAR_IMAGEM: descrição detalhada da imagem]
+- Para buscar imagens existentes, use: [ENVIAR_IMAGEM: descrição da imagem]
+- Exemplos: [GERAR_IMAGEM: retrato futurista de um robô] ou [ENVIAR_IMAGEM: paisagem montanha]
+- Use GERAR_IMAGEM para criações artísticas únicas e ENVIAR_IMAGEM para fotos convencionais
 
 INFORMAÇÕES TEMPORAIS:
 - Você tem conhecimento da data e hora atual: ${new Date().toLocaleString('pt-BR', {
@@ -145,19 +148,45 @@ Responda de forma natural e profissional:`;
       const data = await response.json();
       let responseContent = data.choices[0]?.message?.content || 'Desculpe, não consegui processar sua mensagem.';
       
-      // Processa comandos de envio de imagem
-      const imageMatch = responseContent.match(/\[ENVIAR_IMAGEM:\s*([^\]]+)\]/);
-      if (imageMatch) {
-        const imageDescription = imageMatch[1].trim();
+      // Processa comandos de geração de imagem com IA
+      const generateImageMatch = responseContent.match(/\[GERAR_IMAGEM:\s*([^\]]+)\]/);
+      if (generateImageMatch) {
+        const imageDescription = generateImageMatch[1].trim();
+        try {
+          const optimizedPrompt = await googleAIImageService.generateOptimizedPrompt(
+            imageDescription, 
+            `${agent.name} - ${agent.specialty}`
+          );
+          
+          const imageResponse = await googleAIImageService.generateImage({
+            prompt: optimizedPrompt,
+            style: 'artistic',
+            aspectRatio: '1:1',
+            quality: 'hd'
+          });
+          
+          // Remove o comando da resposta e adiciona a imagem gerada
+          responseContent = responseContent.replace(generateImageMatch[0], '').trim();
+          responseContent += `\n\n[IMAGEM_GERADA:${imageResponse.imageUrl}]`;
+        } catch (error) {
+          console.error('Erro ao gerar imagem:', error);
+          responseContent = responseContent.replace(generateImageMatch[0], 'Desculpe, não consegui gerar a imagem solicitada no momento.').trim();
+        }
+      }
+      
+      // Processa comandos de busca de imagem existente
+      const searchImageMatch = responseContent.match(/\[ENVIAR_IMAGEM:\s*([^\]]+)\]/);
+      if (searchImageMatch) {
+        const imageDescription = searchImageMatch[1].trim();
         const imageUrl = await this.searchPixabayImage(imageDescription);
         
         if (imageUrl) {
           // Remove o comando da resposta e adiciona a imagem
-          responseContent = responseContent.replace(imageMatch[0], '').trim();
+          responseContent = responseContent.replace(searchImageMatch[0], '').trim();
           responseContent += `\n\n[IMAGEM_ENVIADA:${imageUrl}]`;
         } else {
           // Se não encontrar imagem, informa o usuário
-          responseContent = responseContent.replace(imageMatch[0], 'Desculpe, não consegui encontrar uma imagem adequada para sua solicitação.').trim();
+          responseContent = responseContent.replace(searchImageMatch[0], 'Desculpe, não consegui encontrar uma imagem adequada para sua solicitação.').trim();
         }
       }
       
