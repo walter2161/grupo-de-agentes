@@ -14,7 +14,7 @@ const availableAvatars = [
   '/lovable-uploads/9b9bd4ba-9f38-4ca8-8511-98df652c19db.png', // Olivia Palito
   '/lovable-uploads/e9557126-2ae1-417e-99ec-04646026819f.png', // Albert Einstein
   '/lovable-uploads/2b5825b5-6740-461a-a48f-af574865cb85.png', // Walter White
-  '/lovable-uploads/fa0d9153-7ee7-4468-8a2f-c70266a4dfc9.png', // She-Ra
+  '/lovable-uploads/0fc0cc5f-b2dd-4e93-a09c-488663d3a46f.png', // She
   // Novos avatares diversos
   avatarBlackMan,
   avatarBlackWoman,

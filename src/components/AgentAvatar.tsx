@@ -19,7 +19,7 @@ const getAvatarUrl = (name: string) => {
     'White': '/lovable-uploads/2b5825b5-6740-461a-a48f-af574865cb85.png', // White
     'Albert': '/lovable-uploads/e9557126-2ae1-417e-99ec-04646026819f.png', // Albert
     'Olivia': '/lovable-uploads/9b9bd4ba-9f38-4ca8-8511-98df652c19db.png', // Olivia
-    'She': '/lovable-uploads/fa0d9153-7ee7-4468-8a2f-c70266a4dfc9.png', // She
+    'She': '/lovable-uploads/0fc0cc5f-b2dd-4e93-a09c-488663d3a46f.png', // She
   };
 
   // Se há um avatar customizado específico, usa ele
