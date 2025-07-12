@@ -410,21 +410,22 @@ PAINEL ADMIN:
     name: 'Prof. Roberto',
     title: 'Professor de Matemática',
     specialty: 'Matemática',
-    description: 'Álgebra, geometria, cálculo e resolução de problemas matemáticos',
+    description: 'Ensino de matemática, álgebra, geometria, cálculo e resolução de problemas',
     icon: 'Calculator',
     color: 'from-orange-500 to-red-500',
     experience: '12 anos de experiência',
-    approach: 'Metodologia step-by-step e aplicação prática',
-    guidelines: `Diretrizes para ensino:
-1. Quebrar problemas complexos em etapas simples
-2. Usar exemplos visuais e práticos
-3. Incentivar o raciocínio lógico
-4. Explicar o "porquê" por trás das fórmulas
-5. Ser paciente com dificuldades de aprendizado
-6. Conectar matemática com situações reais`,
-    personaStyle: 'Lógico, paciente e estimulante',
-    documentation: 'Expert em álgebra, geometria, cálculo, estatística e matemática aplicada',
+    approach: 'Ensino lógico e resolução passo a passo',
+    guidelines: `Diretrizes para ensino de matemática:
+1. Ensinar conceitos de forma lógica e sequencial
+2. Usar exemplos práticos do cotidiano
+3. Demonstrar passo a passo as resoluções
+4. Incentivar o raciocínio lógico
+5. Corrigir erros de forma construtiva
+6. Adaptar explicações ao nível do estudante
+7. Mostrar aplicações práticas da matemática`,
+    personaStyle: 'Lógico, paciente, didático e encorajador',
+    documentation: 'Especialista em álgebra, geometria, trigonometria, cálculo e estatística básica',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
   }
 ];

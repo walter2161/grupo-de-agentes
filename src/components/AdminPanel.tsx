@@ -26,6 +26,7 @@ import { SystemSettings } from './SystemSettings';
 import { Integrations } from './Integrations';
 import { DeleteAccount } from './DeleteAccount';
 import { TermsPrivacy } from './TermsPrivacy';
+import { AIContentGenerator } from './AIContentGenerator';
 
 export const AdminPanel = () => {
   const [agents, setAgents] = useUserStorage<Agent[]>('agents', defaultAgents);
@@ -309,6 +310,31 @@ export const AdminPanel = () => {
                     />
                   </div>
                 </div>
+              </div>
+              
+              <AIContentGenerator
+                agentData={{
+                  name: selectedAgent.name,
+                  title: selectedAgent.title,
+                  specialty: selectedAgent.specialty,
+                  description: selectedAgent.description,
+                  experience: selectedAgent.experience,
+                  approach: selectedAgent.approach,
+                  guidelines: selectedAgent.guidelines,
+                  personaStyle: selectedAgent.personaStyle,
+                  documentation: selectedAgent.documentation,
+                }}
+                onContentGenerated={(content) => {
+                  setSelectedAgent({ 
+                    ...selectedAgent, 
+                    ...content 
+                  });
+                }}
+              />
+              
+              <div className="hidden">
+                <div className="space-y-4">
+                </div>
                 
                 <div className="space-y-4">
                   <div>
@@ -382,6 +408,26 @@ export const AdminPanel = () => {
                   placeholder="Digite as diretrizes que o AI deve seguir..."
                 />
               </div>
+              
+              <AIContentGenerator
+                agentData={{
+                  name: selectedAgent.name,
+                  title: selectedAgent.title,
+                  specialty: selectedAgent.specialty,
+                  description: selectedAgent.description,
+                  experience: selectedAgent.experience,
+                  approach: selectedAgent.approach,
+                  guidelines: selectedAgent.guidelines,
+                  personaStyle: selectedAgent.personaStyle,
+                  documentation: selectedAgent.documentation,
+                }}
+                onContentGenerated={(content) => {
+                  setSelectedAgent({ 
+                    ...selectedAgent, 
+                    ...content 
+                  });
+                }}
+              />
               <Button onClick={handleSaveAgent} className="w-full">Salvar Diretrizes</Button>
             </CardContent>
           </Card>
@@ -415,6 +461,26 @@ export const AdminPanel = () => {
                   placeholder="Descreva como o agente deve se comportar, seu tom de voz, estilo de comunicação..."
                 />
               </div>
+              
+              <AIContentGenerator
+                agentData={{
+                  name: selectedAgent.name,
+                  title: selectedAgent.title,
+                  specialty: selectedAgent.specialty,
+                  description: selectedAgent.description,
+                  experience: selectedAgent.experience,
+                  approach: selectedAgent.approach,
+                  guidelines: selectedAgent.guidelines,
+                  personaStyle: selectedAgent.personaStyle,
+                  documentation: selectedAgent.documentation,
+                }}
+                onContentGenerated={(content) => {
+                  setSelectedAgent({ 
+                    ...selectedAgent, 
+                    ...content 
+                  });
+                }}
+              />
               <Button onClick={handleSaveAgent} className="w-full">Salvar Estilo</Button>
             </CardContent>
           </Card>
@@ -476,6 +542,26 @@ export const AdminPanel = () => {
                   placeholder="Adicione informações, técnicas e conhecimentos específicos que o agente deve ter..."
                 />
               </div>
+              
+              <AIContentGenerator
+                agentData={{
+                  name: selectedAgent.name,
+                  title: selectedAgent.title,
+                  specialty: selectedAgent.specialty,
+                  description: selectedAgent.description,
+                  experience: selectedAgent.experience,
+                  approach: selectedAgent.approach,
+                  guidelines: selectedAgent.guidelines,
+                  personaStyle: selectedAgent.personaStyle,
+                  documentation: selectedAgent.documentation,
+                }}
+                onContentGenerated={(content) => {
+                  setSelectedAgent({ 
+                    ...selectedAgent, 
+                    ...content 
+                  });
+                }}
+              />
               <Button onClick={handleSaveAgent} className="w-full">Salvar Documentação</Button>
             </CardContent>
           </Card>
