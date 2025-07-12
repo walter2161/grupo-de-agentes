@@ -8,7 +8,7 @@ import { AdminPanel } from '@/components/AdminPanel';
 import { GroupPortal } from '@/components/GroupPortal';
 import { GroupChat } from '@/components/GroupChat';
 import { QuickActionsMenu } from '@/components/QuickActionsMenu';
-import { PersonaManager } from '@/components/PersonaManager';
+
 import { GroupCreator } from '@/components/GroupCreator';
 import { Agent, defaultAgents } from '@/types/agents';
 import { Group, defaultGroups } from '@/types/groups';
@@ -47,7 +47,7 @@ const Index = () => {
   };
 
   const handleCreateAgent = () => {
-    setActiveTab('create-agent');
+    setActiveTab('portal');
   };
 
   const handleCreateGroup = () => {
@@ -87,7 +87,7 @@ const Index = () => {
           return <GroupPortal onGroupSelect={handleGroupSelect} />;
         }
       case 'create-agent':
-        return <PersonaManager />;
+        return <AgentPortal onAgentSelect={handleAgentSelect} onCreateAgent={handleCreateAgent} />;
       case 'create-group':
         return <GroupCreator agents={agents} onCreateGroup={handleGroupCreated} onCancel={() => setActiveTab('groups')} />;
       case 'config':

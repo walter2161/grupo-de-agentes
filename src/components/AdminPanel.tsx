@@ -20,7 +20,7 @@ import { DashboardLayout } from './DashboardLayout';
 import { Dashboard } from './Dashboard';
 import { ChangePassword } from './ChangePassword';
 import { Guidelines } from './Guidelines';
-import { PersonaManager } from './PersonaManager';
+
 import { Documentation } from './Documentation';
 import { SystemSettings } from './SystemSettings';
 import { Integrations } from './Integrations';
@@ -127,7 +127,38 @@ export const AdminPanel = () => {
       case 'guidelines':
         return <Guidelines />;
       case 'persona':
-        return <PersonaManager />;
+        if (!selectedAgent) {
+          return (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Selecione um agente para editar a persona</p>
+            </div>
+          );
+        }
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <MessageSquare className="h-5 w-5" />
+                <span>Estilo da Persona: {selectedAgent.name}</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Personalidade do Agente
+                </label>
+                <Textarea
+                  value={selectedAgent.personaStyle}
+                  onChange={(e) => setSelectedAgent({ ...selectedAgent, personaStyle: e.target.value })}
+                  rows={6}
+                  className="w-full"
+                  placeholder="Descreva como o agente deve se comportar, seu tom de voz, estilo de comunicação..."
+                />
+              </div>
+              <Button onClick={handleSaveAgent} className="w-full">Salvar Estilo</Button>
+            </CardContent>
+          </Card>
+        );
       case 'docs':
         return <Documentation />;
       case 'settings':
