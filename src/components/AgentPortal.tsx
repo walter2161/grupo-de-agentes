@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AgentCard } from './AgentCard';
 import { AgentFilters } from './AgentFilters';
+import { AgentLimitDialog } from './AgentLimitDialog';
 import { Agent } from '@/types/agents';
 import { useUserStorage } from '@/hooks/useUserStorage';
 import { defaultAgents } from '@/types/agents';
 import { checkUserLimits, DEFAULT_USER_LIMITS } from '@/types/userLimits';
-import { toast } from 'sonner';
 
 interface AgentPortalProps {
   onAgentSelect: (agent: Agent) => void;
@@ -22,6 +22,7 @@ export const AgentPortal: React.FC<AgentPortalProps> = ({ onAgentSelect, onCreat
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedExperience, setSelectedExperience] = useState('all');
+  const [showLimitDialog, setShowLimitDialog] = useState(false);
   
   // Contabiliza apenas agentes criados pelo usuário (não os padrão)
   const userCreatedAgents = agents.filter(agent => !defaultAgents.some(defaultAgent => defaultAgent.id === agent.id));
@@ -29,7 +30,7 @@ export const AgentPortal: React.FC<AgentPortalProps> = ({ onAgentSelect, onCreat
 
   const handleCreateAgent = () => {
     if (!canCreateMoreAgents) {
-      toast.error(`Limite atingido! Você pode criar no máximo ${DEFAULT_USER_LIMITS.maxAgents} agentes.`);
+      setShowLimitDialog(true);
       return;
     }
     onCreateAgent?.();
@@ -133,6 +134,13 @@ export const AgentPortal: React.FC<AgentPortalProps> = ({ onAgentSelect, onCreat
           </p>
         </div>
       )}
+
+      {/* Agent Limit Dialog */}
+      <AgentLimitDialog
+        isOpen={showLimitDialog}
+        onClose={() => setShowLimitDialog(false)}
+        currentCount={userCreatedAgents.length}
+      />
     </div>
   );
 };
