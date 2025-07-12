@@ -16,7 +16,7 @@ const getAvatarUrl = (name: string) => {
   // Mapeamento especial para avatares customizados
   const customAvatarMap: { [key: string]: string } = {
     'Ana Silva': '/lovable-uploads/4ee7d20b-937b-4c10-a8a0-d58775e7a74b.png', // Olivia
-    'Homer Simpson': '/lovable-uploads/78c35882-2841-4b44-a720-ad47679c1d33.png', // Homer Simpson
+    'Homer Simpson': '/lovable-uploads/e1541d6e-e4d9-4fbc-8f26-313911f01e14.png', // Homer Simpson
     'Prof. Roberto': '/lovable-uploads/a4e872f4-a3bd-4d06-9fe1-372c967164e8.png', // Einstein
   };
 

@@ -95,7 +95,7 @@ PAINEL ADMIN:
     personaStyle: 'Engraçado, descontraído, família-oriented e autêntico',
     documentation: 'Personagem da série Os Simpsons, conhecido por sua simplicidade, humor e amor pela família',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&h=150&fit=crop&crop=face'
+    avatar: '/lovable-uploads/e1541d6e-e4d9-4fbc-8f26-313911f01e14.png'
   },
   {
     id: 'walter-white',
