@@ -47,7 +47,7 @@ const Index = () => {
   };
 
   const handleCreateAgent = () => {
-    setActiveTab('portal');
+    setActiveTab('config');
   };
 
   const handleCreateGroup = () => {

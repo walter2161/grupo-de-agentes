@@ -34,7 +34,7 @@ export const AdminPanel = () => {
   const [messages] = useUserStorage<Message[]>('chat-history', []);
   const [protocols, setProtocols] = useUserStorage<ConsultationProtocol[]>('consultation-protocols', []);
   type TabType = 'dashboard' | 'profile' | 'change-password' | 'agents' | 'edit-agent' | 'guidelines' | 'persona' | 'docs' | 'history' | 'protocols' | 'settings' | 'integrations' | 'delete' | 'terms' | 'logout';
-  const [activeTab, setActiveTab] = useState<TabType>('dashboard');
+  const [activeTab, setActiveTab] = useState<TabType>('agents'); // Inicia na aba de agentes
 
   const handleSaveAgent = () => {
     if (!selectedAgent) return;
