@@ -48,8 +48,15 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Ref para controlar quando deve fazer scroll automático
+  const shouldAutoScrollRef = useRef(true);
+
   useEffect(() => {
-    scrollToBottom();
+    // Só faz scroll automático se foi solicitado
+    if (shouldAutoScrollRef.current) {
+      scrollToBottom();
+      shouldAutoScrollRef.current = false;
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -123,6 +130,9 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
     
     // Gerencia histórico limitado
     const managedMessages = checkUserLimits.manageChatHistory(messagesWithUser);
+    
+    // Solicita scroll automático ao enviar mensagem
+    shouldAutoScrollRef.current = true;
     setMessages(managedMessages);
     
     setInputMessage('');
@@ -173,6 +183,9 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
       
       // Gerencia histórico novamente após adicionar respostas
       const finalManagedMessages = checkUserLimits.manageChatHistory(finalMessages);
+      
+      // Solicita scroll automático ao receber resposta
+      shouldAutoScrollRef.current = true;
       setMessages(finalManagedMessages);
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
