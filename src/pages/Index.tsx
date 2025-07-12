@@ -8,7 +8,7 @@ import { AdminPanel } from '@/components/AdminPanel';
 import { GroupPortal } from '@/components/GroupPortal';
 import { GroupChat } from '@/components/GroupChat';
 import { QuickActionsMenu } from '@/components/QuickActionsMenu';
-
+import { DailyDisclaimerDialog } from '@/components/DailyDisclaimerDialog';
 import { GroupCreator } from '@/components/GroupCreator';
 import { Agent, defaultAgents } from '@/types/agents';
 import { Group, defaultGroups } from '@/types/groups';
@@ -21,10 +21,27 @@ const Index = () => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [showQuickActions, setShowQuickActions] = useState(false);
+  const [showDailyDisclaimer, setShowDailyDisclaimer] = useState(false);
   const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
   const [groups] = useLocalStorage<Group[]>('groups', defaultGroups);
   const [userProfile] = useLocalStorage<UserProfile>('user-profile', defaultUserProfile);
   const { user, logout } = useAuth();
+
+  // Verifica se deve mostrar o aviso diário
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const lastShown = localStorage.getItem('daily-disclaimer-shown');
+    
+    if (lastShown !== today) {
+      setShowDailyDisclaimer(true);
+    }
+  }, []);
+
+  const handleCloseDisclaimer = () => {
+    const today = new Date().toDateString();
+    localStorage.setItem('daily-disclaimer-shown', today);
+    setShowDailyDisclaimer(false);
+  };
 
   const handleAgentSelect = (agent: Agent) => {
     setSelectedAgent(agent);
@@ -240,12 +257,35 @@ const Index = () => {
         onViewChats={handleViewChats}
       />
 
+      {/* Daily Disclaimer Dialog */}
+      <DailyDisclaimerDialog
+        isOpen={showDailyDisclaimer}
+        onClose={handleCloseDisclaimer}
+      />
+
       {/* Main Content */}
       <main className={`${activeTab === 'chat' || activeTab === 'group-chat' ? 'h-[calc(100vh-5rem)]' : ''} ${activeTab === 'config' ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'} relative z-10`}>
         <div className={`${activeTab === 'chat' || activeTab === 'group-chat' ? 'h-full' : activeTab === 'config' ? 'min-h-[calc(100vh-5rem)]' : 'h-[calc(100vh-12rem)]'}`}>
           {renderContent()}
         </div>
       </main>
+
+      {/* Footer com avisos */}
+      {(activeTab === 'portal' || activeTab === 'groups') && (
+        <footer className="bg-background/95 backdrop-blur border-t border-border relative z-10 py-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
+              <p>
+                <strong>Aviso:</strong> Os agentes são meramente para entretenimento e não são reais. 
+                A criação é de responsabilidade dos criadores, que devem seguir códigos de ética.
+              </p>
+              <p>
+                Este site utiliza cookies para melhorar sua experiência.
+              </p>
+            </div>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };
