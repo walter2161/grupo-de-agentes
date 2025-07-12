@@ -16,11 +16,7 @@ interface AgentAvatarProps {
 export const AgentAvatar: React.FC<AgentAvatarProps> = ({ agent, size = 'lg' }) => {
   const IconComponent = Icons[agent.icon as keyof typeof Icons] as React.ComponentType<any>;
   
-  // Avatar específico apenas para o Simpsom
   const getAvatarUrl = () => {
-    if (agent.name === 'Simpsom') {
-      return '/lovable-uploads/70693022-20b9-4456-8b40-da524932617f.png'; // Foto do Chathy
-    }
     if (agent.avatar) {
       return agent.avatar;
     }
