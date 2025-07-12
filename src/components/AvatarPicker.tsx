@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { AvatarGenerator } from '@/components/AvatarGenerator';
 import avatarBlackMan from '@/assets/avatar-black-man.jpg';
 import avatarBlackWoman from '@/assets/avatar-black-woman.jpg';
 import avatarLatinoMan from '@/assets/avatar-latino-man.jpg';
@@ -44,6 +45,11 @@ interface AvatarPickerProps {
 export const AvatarPicker: React.FC<AvatarPickerProps> = ({ selectedAvatar, onAvatarSelect }) => {
   return (
     <div className="space-y-4">
+      {/* Botão para gerar avatar com IA */}
+      <div className="flex justify-center">
+        <AvatarGenerator onAvatarGenerated={onAvatarSelect} />
+      </div>
+
       <div className="grid grid-cols-4 gap-3 max-h-64 overflow-y-auto">
         {availableAvatars.map((avatarUrl, index) => (
           <Button

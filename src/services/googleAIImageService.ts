@@ -1,6 +1,6 @@
 const GOOGLE_AI_API_KEY = 'AIzaSyCc2AGgRn-KJX7QgA3AMvuCtNhmxvBGWj8';
 const GOOGLE_AI_TEXT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-const GOOGLE_AI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateImage';
+const GOOGLE_AI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent';
 
 export interface ImageGenerationRequest {
   prompt: string;
@@ -78,16 +78,16 @@ Responda APENAS com o prompt otimizado, sem explicações.`
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-goog-api-key': this.apiKey,
+          'x-goog-api-key': this.apiKey,
         },
         body: JSON.stringify({
-          prompt: {
-            text: request.prompt
-          },
+          contents: [{
+            parts: [{
+              text: request.prompt
+            }]
+          }],
           generationConfig: {
-            aspectRatio: this.mapAspectRatio(request.aspectRatio || '1:1'),
-            quality: request.quality === 'hd' ? 'HIGH' : 'STANDARD',
-            style: this.mapStyle(request.style || 'realistic')
+            responseModalities: ['TEXT', 'IMAGE']
           }
         }),
       });
@@ -100,13 +100,23 @@ Responda APENAS com o prompt otimizado, sem explicações.`
 
       const data = await response.json();
       
-      // A API do Google retorna a imagem em base64
-      const imageBase64 = data.candidates?.[0]?.image?.data;
+      // A API do Gemini 2.0 retorna a imagem no formato inlineData
+      let imageBase64 = null;
+      const candidate = data.candidates?.[0];
+      if (candidate?.content?.parts) {
+        for (const part of candidate.content.parts) {
+          if (part.inlineData?.data) {
+            imageBase64 = part.inlineData.data;
+            break;
+          }
+        }
+      }
+      
       if (!imageBase64) {
         throw new Error('Nenhuma imagem foi gerada pela API');
       }
 
-      // Converte base64 para blob URL
+      // Converte base64 para data URL
       const imageUrl = `data:image/png;base64,${imageBase64}`;
       
       return {
@@ -188,27 +198,6 @@ Responda APENAS com o prompt otimizado, sem explicações.`
     return ratioMap[aspectRatio] || 512;
   }
 
-  private mapAspectRatio(aspectRatio: string): string {
-    const ratioMap: { [key: string]: string } = {
-      '1:1': 'SQUARE',
-      '16:9': 'LANDSCAPE',
-      '9:16': 'PORTRAIT',
-      '4:3': 'LANDSCAPE',
-      '3:4': 'PORTRAIT'
-    };
-    return ratioMap[aspectRatio] || 'SQUARE';
-  }
-
-  private mapStyle(style: string): string {
-    const styleMap: { [key: string]: string } = {
-      'realistic': 'PHOTOREALISTIC',
-      'artistic': 'ARTISTIC',
-      'cartoon': 'CARTOON',
-      'anime': 'ANIME',
-      'photographic': 'PHOTOREALISTIC'
-    };
-    return styleMap[style] || 'PHOTOREALISTIC';
-  }
 }
 
 export const googleAIImageService = new GoogleAIImageService();
