@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Settings, User, MessageSquare, Download, BookOpen, Calendar, Trophy, Plus, Edit, Trash2, UserCog } from 'lucide-react';
+import { Settings, User, MessageSquare, Download, BookOpen, Calendar, Trophy, Plus, Edit, Trash2, UserCog, RotateCcw } from 'lucide-react';
 import { useUserStorage } from '@/hooks/useUserStorage';
 import { Message, ConsultationProtocol } from '@/types';
 import { Agent, defaultAgents } from '@/types/agents';
@@ -98,6 +98,16 @@ export const AdminPanel = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handleResetLocalStorage = () => {
+    if (confirm('⚠️ ATENÇÃO: Esta ação irá apagar TODOS os dados locais (agentes personalizados, conversas, configurações). Esta ação não pode ser desfeita. Tem certeza que deseja continuar?')) {
+      if (confirm('Esta é sua última chance! Confirma que deseja resetar TODOS os dados do usuário?')) {
+        localStorage.clear();
+        alert('Todos os dados foram apagados. A página será recarregada.');
+        window.location.reload();
+      }
+    }
   };
 
   const createNewProtocol = () => {

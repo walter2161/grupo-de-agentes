@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Settings, Save, RefreshCw } from 'lucide-react';
+import { Settings, Save, RefreshCw, RotateCcw, Trash2 } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useToast } from '@/hooks/use-toast';
 
@@ -49,6 +49,21 @@ export const SystemSettings = () => {
       title: "Sucesso",
       description: "Configurações restauradas para o padrão!",
     });
+  };
+
+  const handleResetLocalStorage = () => {
+    if (confirm('⚠️ ATENÇÃO: Esta ação irá apagar TODOS os dados locais (agentes personalizados, conversas, configurações). Esta ação não pode ser desfeita. Tem certeza que deseja continuar?')) {
+      if (confirm('Esta é sua última chance! Confirma que deseja resetar TODOS os dados do usuário?')) {
+        localStorage.clear();
+        toast({
+          title: "Dados Apagados",
+          description: "Todos os dados foram removidos. A página será recarregada.",
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    }
   };
 
   const updateSetting = (key: keyof SystemSettings, value: any) => {
@@ -191,6 +206,35 @@ export const SystemSettings = () => {
                 value={tempSettings.backupInterval}
                 onChange={(e) => updateSetting('backupInterval', parseInt(e.target.value) || 24)}
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Zona de Perigo */}
+        <Card className="border-destructive">
+          <CardHeader>
+            <CardTitle className="text-destructive flex items-center space-x-2">
+              <Trash2 className="h-5 w-5" />
+              <span>Zona de Perigo</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-destructive/10 p-4 rounded-lg">
+              <h4 className="font-semibold text-destructive mb-2">
+                Reset Completo do Sistema
+              </h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Esta ação irá apagar TODOS os dados locais incluindo agentes personalizados, 
+                histórico de conversas, configurações e preferências. Esta ação não pode ser desfeita.
+              </p>
+              <Button 
+                variant="destructive" 
+                onClick={handleResetLocalStorage}
+                className="w-full"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Resetar Todos os Dados do Sistema
+              </Button>
             </div>
           </CardContent>
         </Card>
