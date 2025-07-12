@@ -1,5 +1,6 @@
 const GOOGLE_AI_API_KEY = 'AIzaSyCc2AGgRn-KJX7QgA3AMvuCtNhmxvBGWj8';
-const GOOGLE_AI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const GOOGLE_AI_TEXT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GOOGLE_AI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateImage';
 
 export interface ImageGenerationRequest {
   prompt: string;
@@ -70,18 +71,43 @@ Responda APENAS com o prompt otimizado, sem explicações.`
     }
   }
 
-  // Simula a geração de imagem usando Unsplash como placeholder
+  // Gera imagem usando a API real do Google AI Studio
   async generateImage(request: ImageGenerationRequest): Promise<ImageGenerationResponse> {
     try {
-      // Para demonstração, vamos usar uma API de imagens placeholder
-      // Em produção, você integraria com a API real do Google AI Studio
+      const response = await fetch(GOOGLE_AI_IMAGE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-goog-api-key': this.apiKey,
+        },
+        body: JSON.stringify({
+          prompt: {
+            text: request.prompt
+          },
+          generationConfig: {
+            aspectRatio: this.mapAspectRatio(request.aspectRatio || '1:1'),
+            quality: request.quality === 'hd' ? 'HIGH' : 'STANDARD',
+            style: this.mapStyle(request.style || 'realistic')
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Erro na API Google AI:', response.status, errorData);
+        throw new Error(`Erro na API Google AI: ${response.status}`);
+      }
+
+      const data = await response.json();
       
-      const searchTerm = this.extractKeywords(request.prompt);
-      const width = this.getWidthFromAspectRatio(request.aspectRatio || '1:1');
-      const height = this.getHeightFromAspectRatio(request.aspectRatio || '1:1');
-      
-      // Usando Unsplash como placeholder até a integração real
-      const imageUrl = `https://source.unsplash.com/${width}x${height}/?${encodeURIComponent(searchTerm)}`;
+      // A API do Google retorna a imagem em base64
+      const imageBase64 = data.candidates?.[0]?.image?.data;
+      if (!imageBase64) {
+        throw new Error('Nenhuma imagem foi gerada pela API');
+      }
+
+      // Converte base64 para blob URL
+      const imageUrl = `data:image/png;base64,${imageBase64}`;
       
       return {
         imageUrl,
@@ -90,7 +116,18 @@ Responda APENAS com o prompt otimizado, sem explicações.`
       };
     } catch (error) {
       console.error('Erro ao gerar imagem:', error);
-      throw new Error('Falha na geração da imagem. Tente novamente.');
+      
+      // Fallback para Unsplash em caso de erro na API
+      const searchTerm = this.extractKeywords(request.prompt);
+      const width = this.getWidthFromAspectRatio(request.aspectRatio || '1:1');
+      const height = this.getHeightFromAspectRatio(request.aspectRatio || '1:1');
+      const fallbackUrl = `https://source.unsplash.com/${width}x${height}/?${encodeURIComponent(searchTerm)}`;
+      
+      return {
+        imageUrl: fallbackUrl,
+        prompt: request.prompt,
+        timestamp: new Date()
+      };
     }
   }
 
@@ -149,6 +186,28 @@ Responda APENAS com o prompt otimizado, sem explicações.`
       '3:4': 640
     };
     return ratioMap[aspectRatio] || 512;
+  }
+
+  private mapAspectRatio(aspectRatio: string): string {
+    const ratioMap: { [key: string]: string } = {
+      '1:1': 'SQUARE',
+      '16:9': 'LANDSCAPE',
+      '9:16': 'PORTRAIT',
+      '4:3': 'LANDSCAPE',
+      '3:4': 'PORTRAIT'
+    };
+    return ratioMap[aspectRatio] || 'SQUARE';
+  }
+
+  private mapStyle(style: string): string {
+    const styleMap: { [key: string]: string } = {
+      'realistic': 'PHOTOREALISTIC',
+      'artistic': 'ARTISTIC',
+      'cartoon': 'CARTOON',
+      'anime': 'ANIME',
+      'photographic': 'PHOTOREALISTIC'
+    };
+    return styleMap[style] || 'PHOTOREALISTIC';
   }
 }
 
