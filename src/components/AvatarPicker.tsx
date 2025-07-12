@@ -1,5 +1,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import avatarBlackMan from '@/assets/avatar-black-man.jpg';
+import avatarBlackWoman from '@/assets/avatar-black-woman.jpg';
+import avatarLatinoMan from '@/assets/avatar-latino-man.jpg';
+import avatarLatinaWoman from '@/assets/avatar-latina-woman.jpg';
+import avatarAsianMan from '@/assets/avatar-asian-man.jpg';
+import avatarAsianWoman from '@/assets/avatar-asian-woman.jpg';
 
 const availableAvatars = [
   // Avatares especiais customizados
@@ -8,6 +14,13 @@ const availableAvatars = [
   '/lovable-uploads/e9557126-2ae1-417e-99ec-04646026819f.png', // Albert Einstein
   '/lovable-uploads/2b5825b5-6740-461a-a48f-af574865cb85.png', // Walter White
   '/lovable-uploads/fa0d9153-7ee7-4468-8a2f-c70266a4dfc9.png', // She-Ra
+  // Novos avatares diversos
+  avatarBlackMan,
+  avatarBlackWoman,
+  avatarLatinoMan,
+  avatarLatinaWoman,
+  avatarAsianMan,
+  avatarAsianWoman,
   // Avatares do Unsplash
   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
   'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face',
