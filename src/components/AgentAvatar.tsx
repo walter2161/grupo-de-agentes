@@ -14,9 +14,20 @@ interface AgentAvatarProps {
 }
 
 const getAvatarUrl = (name: string) => {
-  // Usando fotos únicas de rostos de pessoas reais para cada agente
+  // Mapeamento especial para avatares customizados
+  const customAvatarMap: { [key: string]: string } = {
+    'Ana Silva': '/lovable-uploads/4ee7d20b-937b-4c10-a8a0-d58775e7a74b.png', // Olivia
+    'João Risada': '/lovable-uploads/78b44631-4ffa-43d8-845e-20236e2ac983.png', // Homer Simpson
+    'Prof. Roberto': '/lovable-uploads/a4e872f4-a3bd-4d06-9fe1-372c967164e8.png', // Einstein
+  };
+
+  // Se há um avatar customizado específico, usa ele
+  if (customAvatarMap[name]) {
+    return customAvatarMap[name];
+  }
+
+  // Caso contrário, usa fotos do Unsplash para outros agentes
   const avatarMap: { [key: string]: string } = {
-    'Ana Silva': 'photo-1494790108755-2616b612b5bc',
     'Carlos Mendes': 'photo-1507003211169-0a1dd7228f2d', 
     'Beatriz Costa': 'photo-1438761681033-6461ffad8d80',
     'Rafael Oliveira': 'photo-1472099645785-5658abf4ff4e',
@@ -24,9 +35,7 @@ const getAvatarUrl = (name: string) => {
     'José Silva': 'photo-1500648767791-00dcc994a43e',
     'Dra. Fernanda Lima': 'photo-1573496359142-b8d87734a5a2',
     'Dr. Paulo': 'photo-1612349317150-e413f6a5b16d',
-    'João Risada': 'photo-1527980965255-d3b416303d12',
     'Prof. Ana Carla': 'photo-1580489944761-15a19d654956',
-    'Prof. Roberto': 'photo-1560250097-0b93528c311a',
   };
 
   const photoId = avatarMap[name] || 'photo-1494790108755-2616b612b5bc';

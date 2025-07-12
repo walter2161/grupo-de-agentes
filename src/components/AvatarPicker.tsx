@@ -3,6 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 
 const availableAvatars = [
+  // Avatares especiais customizados
+  '/lovable-uploads/4ee7d20b-937b-4c10-a8a0-d58775e7a74b.png', // Olivia
+  '/lovable-uploads/78b44631-4ffa-43d8-845e-20236e2ac983.png', // Homer Simpson
+  '/lovable-uploads/a4e872f4-a3bd-4d06-9fe1-372c967164e8.png', // Einstein
+  // Avatares do Unsplash
   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
   'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face',
   'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
