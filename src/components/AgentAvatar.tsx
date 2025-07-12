@@ -15,7 +15,7 @@ interface AgentAvatarProps {
 const getAvatarUrl = (name: string) => {
   // Mapeamento especial para avatares customizados
   const customAvatarMap: { [key: string]: string } = {
-    'Simpsom': '/lovable-uploads/395899f9-2985-465e-838d-f1d9ebe9a467.png', // Simpsom
+    'Homer': '/lovable-uploads/395899f9-2985-465e-838d-f1d9ebe9a467.png', // Homer
     'White': '/lovable-uploads/2b5825b5-6740-461a-a48f-af574865cb85.png', // White
     'Albert': '/lovable-uploads/e9557126-2ae1-417e-99ec-04646026819f.png', // Albert
     'Olivia': '/lovable-uploads/9b9bd4ba-9f38-4ca8-8511-98df652c19db.png', // Olivia
