@@ -3,9 +3,7 @@ import { Button } from '@/components/ui/button';
 
 const availableAvatars = [
   // Avatares especiais customizados
-  '/lovable-uploads/4ee7d20b-937b-4c10-a8a0-d58775e7a74b.png', // Olivia
   '/lovable-uploads/395899f9-2985-465e-838d-f1d9ebe9a467.png', // Simpsom
-  '/lovable-uploads/a4e872f4-a3bd-4d06-9fe1-372c967164e8.png', // Einstein
   '/lovable-uploads/9b9bd4ba-9f38-4ca8-8511-98df652c19db.png', // Olivia Palito
   '/lovable-uploads/e9557126-2ae1-417e-99ec-04646026819f.png', // Albert Einstein
   '/lovable-uploads/2b5825b5-6740-461a-a48f-af574865cb85.png', // Walter White
