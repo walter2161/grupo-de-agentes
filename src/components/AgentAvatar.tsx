@@ -16,6 +16,14 @@ interface AgentAvatarProps {
 export const AgentAvatar: React.FC<AgentAvatarProps> = ({ agent, size = 'lg' }) => {
   const IconComponent = Icons[agent.icon as keyof typeof Icons] as React.ComponentType<any>;
   
+  // Avatar específico apenas para o Simpsom
+  const getAvatarUrl = () => {
+    if (agent.name === 'Simpsom') {
+      return '/lovable-uploads/395899f9-2985-465e-838d-f1d9ebe9a467.png';
+    }
+    return "/src/assets/default-user-avatar.png";
+  };
+  
   const sizeClasses = {
     sm: { avatar: 'w-12 h-12', icon: 'w-6 h-6', iconContainer: 'w-5 h-5', iconSize: 'h-3 w-3' },
     md: { avatar: 'w-16 h-16', icon: 'w-8 h-8', iconContainer: 'w-6 h-6', iconSize: 'h-4 w-4' },
@@ -27,7 +35,7 @@ export const AgentAvatar: React.FC<AgentAvatarProps> = ({ agent, size = 'lg' }) 
   return (
     <div className="relative inline-block">
       <Avatar className={sizes.avatar}>
-        <AvatarImage src="/src/assets/default-user-avatar.png" alt={agent.name} />
+        <AvatarImage src={getAvatarUrl()} alt={agent.name} />
         <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
           {agent.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
         </AvatarFallback>
