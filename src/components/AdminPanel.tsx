@@ -422,10 +422,16 @@ export const AdminPanel = () => {
                   documentation: selectedAgent.documentation,
                 }}
                 onContentGenerated={(content) => {
-                  setSelectedAgent({ 
+                  console.log('Callback executado com conteúdo:', content);
+                  console.log('Estado atual do agente:', selectedAgent);
+                  
+                  const updatedAgent = { 
                     ...selectedAgent, 
                     ...content 
-                  });
+                  };
+                  
+                  console.log('Agente atualizado:', updatedAgent);
+                  setSelectedAgent(updatedAgent);
                 }}
               />
               <Button onClick={handleSaveAgent} className="w-full">Salvar Diretrizes</Button>

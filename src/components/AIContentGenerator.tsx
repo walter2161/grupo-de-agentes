@@ -33,6 +33,9 @@ export const AIContentGenerator: React.FC<AIContentGeneratorProps> = ({
   const { toast } = useToast();
 
   const generateContent = async (contentType: 'description' | 'guidelines' | 'persona' | 'documentation' | 'approach') => {
+    console.log('Gerando conteúdo para:', contentType);
+    console.log('Dados do agente:', agentData);
+    
     setIsGenerating(true);
     
     try {
@@ -64,13 +67,20 @@ export const AIContentGenerator: React.FC<AIContentGeneratorProps> = ({
           break;
       }
 
-      onContentGenerated({ [contentType]: generatedContent });
+      console.log('Conteúdo gerado:', generatedContent);
+      console.log('Tipo de conteúdo:', contentType);
+
+      const contentUpdate = { [contentType]: generatedContent };
+      console.log('Objeto a ser passado para callback:', contentUpdate);
+      
+      onContentGenerated(contentUpdate);
       
       toast({
         title: "Conteúdo gerado com sucesso!",
         description: `${contentType} foi gerado automaticamente baseado nas informações fornecidas.`,
       });
     } catch (error) {
+      console.error('Erro ao gerar conteúdo:', error);
       toast({
         title: "Erro ao gerar conteúdo",
         description: "Tente novamente em alguns instantes.",
