@@ -332,46 +332,41 @@ export const AdminPanel = () => {
                 }}
               />
               
-              <div className="hidden">
-                <div className="space-y-4">
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-3">Avatar</label>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-foreground mb-2">Upload Personalizado</h4>
-                        <CustomImageUpload
-                          currentImage={selectedAgent.avatar}
-                          onImageSelect={(avatar) => setSelectedAgent({ ...selectedAgent, avatar })}
-                        />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-foreground mb-2">Ou escolha um avatar predefinido</h4>
-                        <AvatarPicker
-                          selectedAvatar={selectedAgent.avatar || ''}
-                          onAvatarSelect={(avatar) => setSelectedAgent({ ...selectedAgent, avatar })}
-                        />
-                      </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-3">Avatar</label>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-foreground mb-2">Upload Personalizado</h4>
+                      <CustomImageUpload
+                        currentImage={selectedAgent.avatar}
+                        onImageSelect={(avatar) => setSelectedAgent({ ...selectedAgent, avatar })}
+                      />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-foreground mb-2">Ou escolha um avatar predefinido</h4>
+                      <AvatarPicker
+                        selectedAvatar={selectedAgent.avatar || ''}
+                        onAvatarSelect={(avatar) => setSelectedAgent({ ...selectedAgent, avatar })}
+                      />
                     </div>
                   </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-3">Ícone da Profissão</label>
-                    <IconPicker
-                      selectedIcon={selectedAgent.icon}
-                      onIconSelect={(icon) => setSelectedAgent({ ...selectedAgent, icon })}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-3">Cor do Tema</label>
-                    <ColorPicker
-                      selectedColor={selectedAgent.color}
-                      onColorSelect={(color) => setSelectedAgent({ ...selectedAgent, color })}
-                    />
-                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-3">Ícone da Profissão</label>
+                  <IconPicker
+                    selectedIcon={selectedAgent.icon}
+                    onIconSelect={(icon) => setSelectedAgent({ ...selectedAgent, icon })}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-3">Cor do Tema</label>
+                  <ColorPicker
+                    selectedColor={selectedAgent.color}
+                    onColorSelect={(color) => setSelectedAgent({ ...selectedAgent, color })}
+                  />
                 </div>
               </div>
               
