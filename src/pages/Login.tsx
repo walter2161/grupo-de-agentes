@@ -52,11 +52,12 @@ export const Login: React.FC = () => {
     if (isLoginMode) {
       return email.trim() && password.length === 6;
     } else {
+      const captchaValid = captchaAnswer.trim() !== '' && parseInt(captchaAnswer) === captchaQuestion.answer;
       return email.trim() && 
              name.trim() && 
              password.length === 6 && 
              termsAccepted && 
-             parseInt(captchaAnswer) === captchaQuestion.answer;
+             captchaValid;
     }
   }, [isLoginMode, email, name, password, termsAccepted, captchaAnswer, captchaQuestion.answer]);
 
@@ -358,15 +359,44 @@ export const Login: React.FC = () => {
                       </div>
                     </div>
                   </>
-                )}
+                 )}
 
-                <Button
-                  type="submit"
-                  className="w-full h-12 text-base font-medium bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={loading || !isFormValid}
-                >
-                  {loading ? 'Processando...' : (isLoginMode ? 'Entrar' : 'Criar conta')}
-                </Button>
+                 {/* Indicador de status dos campos no modo cadastro */}
+                 {!isLoginMode && (
+                   <div className="p-3 bg-blue-50 rounded-lg text-xs text-gray-600">
+                     <p className="font-medium mb-1">Status dos campos obrigatórios:</p>
+                     <div className="space-y-1">
+                       <div className="flex items-center space-x-2">
+                         <span className={email.trim() ? "text-green-600" : "text-red-500"}>●</span>
+                         <span>Email válido</span>
+                       </div>
+                       <div className="flex items-center space-x-2">
+                         <span className={name.trim() ? "text-green-600" : "text-red-500"}>●</span>
+                         <span>Nome completo</span>
+                       </div>
+                       <div className="flex items-center space-x-2">
+                         <span className={password.length === 6 ? "text-green-600" : "text-red-500"}>●</span>
+                         <span>Senha (exatamente 6 números)</span>
+                       </div>
+                       <div className="flex items-center space-x-2">
+                         <span className={captchaAnswer.trim() !== '' && parseInt(captchaAnswer) === captchaQuestion.answer ? "text-green-600" : "text-red-500"}>●</span>
+                         <span>Captcha resolvido corretamente</span>
+                       </div>
+                       <div className="flex items-center space-x-2">
+                         <span className={termsAccepted ? "text-green-600" : "text-red-500"}>●</span>
+                         <span>Termos aceitos</span>
+                       </div>
+                     </div>
+                   </div>
+                 )}
+
+                 <Button
+                   type="submit"
+                   className="w-full h-12 text-base font-medium bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                   disabled={loading || !isFormValid}
+                 >
+                   {loading ? 'Processando...' : (isLoginMode ? 'Entrar' : 'Criar conta')}
+                 </Button>
 
                 <div className="text-center">
                   <button
