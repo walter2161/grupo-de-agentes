@@ -42,7 +42,7 @@ export function useUserStorage<T>(key: string, initialValue: T): [T, (value: T |
         setStoredValue(initialValue);
       }
     }
-  }, [user?.id, key, initialValue]);
+  }, [user?.id, key]);
 
   return [storedValue, setValue];
 }
