@@ -15,13 +15,11 @@ interface AgentAvatarProps {
 const getAvatarUrl = (name: string) => {
   // Mapeamento especial para avatares customizados
   const customAvatarMap: { [key: string]: string } = {
-    'Ana Silva': '/lovable-uploads/4ee7d20b-937b-4c10-a8a0-d58775e7a74b.png', // Olivia
     'Simpsom': '/lovable-uploads/395899f9-2985-465e-838d-f1d9ebe9a467.png', // Simpsom
-    'Prof. Roberto': '/lovable-uploads/a4e872f4-a3bd-4d06-9fe1-372c967164e8.png', // Einstein
-    'Olivia Palito': '/lovable-uploads/9b9bd4ba-9f38-4ca8-8511-98df652c19db.png?v=2', // Nova Olivia
-    'Albert Einstein': '/lovable-uploads/e9557126-2ae1-417e-99ec-04646026819f.png?v=2', // Einstein divertido
-    'Walter White': '/lovable-uploads/2b5825b5-6740-461a-a48f-af574865cb85.png?v=2', // Walter White
-    'She-Ra': '/lovable-uploads/fa0d9153-7ee7-4468-8a2f-c70266a4dfc9.png?v=2', // She-Ra
+    'Olivia Palito': '/lovable-uploads/9b9bd4ba-9f38-4ca8-8511-98df652c19db.png', // Olivia Palito
+    'Albert Einstein': '/lovable-uploads/e9557126-2ae1-417e-99ec-04646026819f.png', // Albert Einstein
+    'Walter White': '/lovable-uploads/2b5825b5-6740-461a-a48f-af574865cb85.png', // Walter White
+    'She-Ra': '/lovable-uploads/fa0d9153-7ee7-4468-8a2f-c70266a4dfc9.png', // She-Ra
   };
 
   // Se há um avatar customizado específico, usa ele
