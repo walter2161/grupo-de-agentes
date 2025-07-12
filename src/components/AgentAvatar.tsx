@@ -12,16 +12,37 @@ interface AgentAvatarProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
+const getAvatarUrl = (name: string) => {
+  // Mapeamento especial para avatares customizados
+  const customAvatarMap: { [key: string]: string } = {
+    'Ana Silva': '/lovable-uploads/4ee7d20b-937b-4c10-a8a0-d58775e7a74b.png', // Olivia
+    'Simpsom': '/lovable-uploads/395899f9-2985-465e-838d-f1d9ebe9a467.png', // Simpsom
+    'Prof. Roberto': '/lovable-uploads/a4e872f4-a3bd-4d06-9fe1-372c967164e8.png', // Einstein
+  };
+
+  // Se há um avatar customizado específico, usa ele
+  if (customAvatarMap[name]) {
+    return customAvatarMap[name];
+  }
+
+  // Caso contrário, usa fotos do Unsplash para outros agentes
+  const avatarMap: { [key: string]: string } = {
+    'Carlos Mendes': 'photo-1507003211169-0a1dd7228f2d', 
+    'Beatriz Costa': 'photo-1438761681033-6461ffad8d80',
+    'Rafael Oliveira': 'photo-1472099645785-5658abf4ff4e',
+    'Marina Santos': 'photo-1544005313-94ddf0286df2',
+    'José Silva': 'photo-1500648767791-00dcc994a43e',
+    'Dra. Fernanda Lima': 'photo-1573496359142-b8d87734a5a2',
+    'Dr. Paulo': 'photo-1612349317150-e413f6a5b16d',
+    'Prof. Ana Carla': 'photo-1580489944761-15a19d654956',
+  };
+
+  const photoId = avatarMap[name] || 'photo-1494790108755-2616b612b5bc';
+  return `https://images.unsplash.com/${photoId}?w=150&h=150&fit=crop&crop=face`;
+};
 
 export const AgentAvatar: React.FC<AgentAvatarProps> = ({ agent, size = 'lg' }) => {
   const IconComponent = Icons[agent.icon as keyof typeof Icons] as React.ComponentType<any>;
-  
-  const getAvatarUrl = () => {
-    if (agent.avatar) {
-      return agent.avatar;
-    }
-    return "/src/assets/default-user-avatar.png";
-  };
   
   const sizeClasses = {
     sm: { avatar: 'w-12 h-12', icon: 'w-6 h-6', iconContainer: 'w-5 h-5', iconSize: 'h-3 w-3' },
@@ -34,7 +55,7 @@ export const AgentAvatar: React.FC<AgentAvatarProps> = ({ agent, size = 'lg' }) 
   return (
     <div className="relative inline-block">
       <Avatar className={sizes.avatar}>
-        <AvatarImage src={getAvatarUrl()} alt={agent.name} />
+        <AvatarImage src={agent.avatar || getAvatarUrl(agent.name)} alt={agent.name} />
         <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
           {agent.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
         </AvatarFallback>
