@@ -270,22 +270,6 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Footer com avisos */}
-      {(activeTab === 'portal' || activeTab === 'groups') && (
-        <footer className="bg-background/95 backdrop-blur border-t border-border relative z-10 py-4">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-              <p>
-                <strong>Aviso:</strong> Os agentes são meramente para entretenimento e não são reais. 
-                A criação é de responsabilidade dos criadores, que devem seguir códigos de ética.
-              </p>
-              <p>
-                Este site utiliza cookies para melhorar sua experiência.
-              </p>
-            </div>
-          </div>
-        </footer>
-      )}
     </div>
   );
 };
