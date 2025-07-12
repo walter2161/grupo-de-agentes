@@ -104,43 +104,15 @@ export const Login: React.FC = () => {
     }
   };
 
-  // Imagem e mensagem estáticas baseadas no dia
-  const dailyContent = useMemo(() => {
-    const backgroundImages = [
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=1200&fit=crop&crop=faces',
-      'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=800&h=1200&fit=crop&crop=faces',
-      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=1200&fit=crop&crop=faces',
-      'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&h=1200&fit=crop&crop=faces'
-    ];
-
-    const motivationalMessages = [
-      "Conecte-se com amigos inteligentes através da tecnologia do Chathy! 🤖✨",
-      "A amizade é mais forte quando compartilhamos conhecimento e diversão! 🚀💙",
-      "Descubra novas conversas e crie vínculos únicos com nossos agentes! 🌟💫",
-      "Tecnologia que aproxima corações e mentes em cada chat! 💝🧠",
-      "Sua próxima amizade digital está a um clique de distância! 🔮🤝",
-      "Juntos, humanos e IA, construímos um mundo mais conectado! 🌍💖",
-      "Chathy torna cada conversa uma nova aventura de amizade! 🎮🌈"
-    ];
-
-    // Usa o dia do ano para ter uma imagem/mensagem consistente por dia
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-    
-    return {
-      image: backgroundImages[dayOfYear % backgroundImages.length],
-      message: motivationalMessages[dayOfYear % motivationalMessages.length]
-    };
-  }, []);
+  // Conteúdo estático motivacional
+  const dailyContent = {
+    message: "Conecte-se com amigos inteligentes através da tecnologia do Chathy! 🤖✨"
+  };
 
   return (
     <div className="min-h-screen flex">
       {/* Coluna da imagem */}
-      <div className="hidden lg:flex lg:w-1/2 relative">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${dailyContent.image})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/80 to-teal-600/80" />
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-blue-600/80 to-teal-600/80">
         <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white">
           <div className="max-w-md text-center">
             <div className="mb-8">
