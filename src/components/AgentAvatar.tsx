@@ -19,6 +19,7 @@ const getAvatarUrl = (name: string) => {
     'Simpsom': '/lovable-uploads/395899f9-2985-465e-838d-f1d9ebe9a467.png', // Simpsom
     'Prof. Roberto': '/lovable-uploads/a4e872f4-a3bd-4d06-9fe1-372c967164e8.png', // Einstein
     'Olivia Palito': '/lovable-uploads/e6a8a37e-369d-4090-a807-67133f49df69.png', // Nova Olivia
+    'Albert Einstein': '/lovable-uploads/a601652b-ab04-4bb4-bef6-bd6f35f34d56.png', // Einstein divertido
   };
 
   // Se há um avatar customizado específico, usa ele
