@@ -160,7 +160,7 @@ export const Login: React.FC = () => {
       </div>
 
       {/* Coluna do formulário */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white/90 backdrop-blur-sm">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">

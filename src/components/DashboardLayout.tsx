@@ -95,40 +95,13 @@ const menuStructure: MenuGroup[] = [
   }
 ];
 
-// Lista de imagens de fundo randômicas - otimizadas para carregamento rápido
-const backgroundImages = [
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-  'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-  'https://images.unsplash.com/photo-1506785803032-6bfd0c21e93a?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-  'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-  'https://images.unsplash.com/photo-1517292987719-0369a794ec0f?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-  'https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75',
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=landscape&auto=format&q=75'
-];
-
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
   children, 
   activeTab, 
   onTabChange 
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [backgroundImage, setBackgroundImage] = useState('');
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['agents-group']);
-
-  // Seleciona uma imagem de fundo aleatória ao carregar o componente
-  useEffect(() => {
-    const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
-    setBackgroundImage(randomImage);
-  }, []);
-
-  // Seleciona uma nova imagem quando a aba muda
-  useEffect(() => {
-    const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
-    setBackgroundImage(randomImage);
-  }, [activeTab]);
 
   const toggleGroup = (groupId: string) => {
     setExpandedGroups(prev => 
@@ -171,17 +144,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
-      {/* Imagem de fundo sutil */}
-      <div 
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-[0.15] pointer-events-none z-0"
-        style={{ 
-          backgroundImage: `url(${backgroundImage})`,
-          filter: 'grayscale(20%)'
-        }}
-      />
-      
-      {/* Overlay para mobile quando sidebar está aberta */}
+    <div className="min-h-screen relative">
+      {/* Removido sistema de imagem de fundo - usando apenas o padrão rapport */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
@@ -297,7 +261,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       {/* Main Content */}
       <div className="lg:ml-64 min-h-screen relative z-10">
         {/* Top Bar */}
-        <header className="bg-background border-b border-border p-4">
+        <header className="border-b border-border p-4 bg-white/90 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button
