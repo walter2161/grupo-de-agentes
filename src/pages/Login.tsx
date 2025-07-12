@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { PasswordInput } from '@/components/PasswordInput';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mail, User, ExternalLink } from 'lucide-react';
+import { Mail, User, ExternalLink, RefreshCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const Login: React.FC = () => {
@@ -22,7 +22,7 @@ export const Login: React.FC = () => {
   const { login, register } = useAuth();
 
   // Gera pergunta matemática simples para captcha
-  const generateCaptcha = useMemo(() => {
+  const generateCaptcha = () => {
     const num1 = Math.floor(Math.random() * 10) + 1;
     const num2 = Math.floor(Math.random() * 10) + 1;
     const operations = ['+', '-'];
@@ -32,15 +32,20 @@ export const Login: React.FC = () => {
     const answer = operation === '+' ? num1 + num2 : num1 - num2;
     
     return { question, answer };
-  }, [isLoginMode]);
+  };
+
+  const refreshCaptcha = () => {
+    setCaptchaQuestion(generateCaptcha());
+    setCaptchaAnswer('');
+  };
 
   // Atualiza captcha quando muda para cadastro
   React.useEffect(() => {
     if (!isLoginMode) {
-      setCaptchaQuestion(generateCaptcha);
+      setCaptchaQuestion(generateCaptcha());
       setCaptchaAnswer('');
     }
-  }, [isLoginMode, generateCaptcha]);
+  }, [isLoginMode]);
 
   // Verifica se todos os campos estão preenchidos para habilitar o botão
   const isFormValid = useMemo(() => {
@@ -167,12 +172,12 @@ export const Login: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-900">
               {isLoginMode ? 'Entrar na sua conta' : 'Criar nova conta'}
             </h2>
-            <p className="text-gray-600 mt-2">
-              {isLoginMode 
-                ? 'Digite suas credenciais para acessar' 
-                : 'Preencha os dados para se cadastrar'
-              }
-            </p>
+             <p className="text-gray-600 mt-2">
+               {isLoginMode 
+                 ? 'Digite suas credenciais para acessar' 
+                 : 'Preencha todos os campos obrigatórios (*) para se cadastrar'
+               }
+             </p>
           </div>
 
           <Card className="border-0 shadow-lg">
@@ -200,8 +205,10 @@ export const Login: React.FC = () => {
                 </div>
 
                 {!isLoginMode && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Nome completo</label>
+                   <div className="space-y-2">
+                     <label className="text-sm font-medium text-gray-700">
+                       Nome completo <span className="text-red-500">*</span>
+                     </label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
@@ -225,31 +232,46 @@ export const Login: React.FC = () => {
 
                 {!isLoginMode && (
                   <>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Verificação de Segurança</label>
-                      <div className="p-4 bg-gray-50 rounded-lg border">
-                        <div className="flex items-center space-x-3">
-                          <div className="text-lg font-mono bg-white px-3 py-2 rounded border">
-                            {captchaQuestion.question} = ?
-                          </div>
-                          <Input
-                            type="number"
-                            value={captchaAnswer}
-                            onChange={(e) => setCaptchaAnswer(e.target.value)}
-                            placeholder="Resposta"
-                            className="w-24"
-                            required
-                            disabled={loading}
-                          />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">
-                          Resolva esta operação matemática para provar que você não é um robô
-                        </p>
-                      </div>
-                    </div>
+                     <div className="space-y-2">
+                       <label className="text-sm font-medium text-gray-700">
+                         Verificação de Segurança <span className="text-red-500">*</span>
+                       </label>
+                       <div className="p-4 bg-gray-50 rounded-lg border">
+                         <div className="flex items-center space-x-3">
+                           <div className="text-lg font-mono bg-white px-3 py-2 rounded border flex-shrink-0">
+                             {captchaQuestion.question} = ?
+                           </div>
+                           <Input
+                             type="number"
+                             value={captchaAnswer}
+                             onChange={(e) => setCaptchaAnswer(e.target.value)}
+                             placeholder="Resposta"
+                             className="w-24"
+                             required
+                             disabled={loading}
+                           />
+                           <Button
+                             type="button"
+                             variant="outline"
+                             size="sm"
+                             onClick={refreshCaptcha}
+                             disabled={loading}
+                             className="p-2 h-8 w-8"
+                             title="Gerar nova pergunta"
+                           >
+                             <RefreshCcw className="h-3 w-3" />
+                           </Button>
+                         </div>
+                         <p className="text-xs text-gray-500 mt-2">
+                           Resolva esta operação matemática para provar que você não é um robô
+                         </p>
+                       </div>
+                     </div>
 
-                    <div className="space-y-3">
-                      <label className="text-sm font-medium text-gray-700">Termos de Uso</label>
+                     <div className="space-y-3">
+                       <label className="text-sm font-medium text-gray-700">
+                         Termos de Uso <span className="text-red-500">*</span>
+                       </label>
                       <div className="flex items-start space-x-3">
                         <Checkbox
                           id="terms"

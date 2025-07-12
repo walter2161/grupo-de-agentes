@@ -20,6 +20,7 @@ const getAvatarUrl = (name: string) => {
     'Prof. Roberto': '/lovable-uploads/a4e872f4-a3bd-4d06-9fe1-372c967164e8.png', // Einstein
     'Olivia Palito': '/lovable-uploads/e6a8a37e-369d-4090-a807-67133f49df69.png', // Nova Olivia
     'Albert Einstein': '/lovable-uploads/a601652b-ab04-4bb4-bef6-bd6f35f34d56.png', // Einstein divertido
+    'Walter White': '/lovable-uploads/23193c5f-0a8e-47bd-96fd-1f29f9394ab5.png', // Walter White
   };
 
   // Se há um avatar customizado específico, usa ele
