@@ -53,6 +53,7 @@ const menuStructure: MenuGroup[] = [
     tab: 'profile',
     isExpandable: true,
     children: [
+      { id: 'profile', label: 'Perfil', icon: UserCog },
       { id: 'change-password', label: 'Trocar senha', icon: Lock }
     ]
   },
@@ -63,6 +64,7 @@ const menuStructure: MenuGroup[] = [
     tab: 'agents',
     isExpandable: true,
     children: [
+      { id: 'agents', label: 'Agentes', icon: Users },
       { id: 'guidelines', label: 'Diretrizes', icon: BookOpen },
       { id: 'persona', label: 'Persona', icon: MessageSquare },
       { id: 'docs', label: 'Documentação', icon: FileText },
@@ -77,6 +79,7 @@ const menuStructure: MenuGroup[] = [
     tab: 'settings',
     isExpandable: true,
     children: [
+      { id: 'settings', label: 'Configurações', icon: Settings },
       { id: 'integrations', label: 'Integrações', icon: Plug },
       { id: 'delete', label: 'Excluir', icon: Trash2 }
     ]
