@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, Mic, MicOff, ArrowLeft, Image, Square } from 'lucide-react';
+import { Send, Mic, MicOff, ArrowLeft, Image, Square, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -480,6 +480,22 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
     }
   };
 
+  const handleClearChat = () => {
+    if (window.confirm('Tem certeza que deseja apagar toda a conversa? Esta ação não pode ser desfeita.')) {
+      setMessages([]);
+      // Reinicia a conversa com mensagem de boas-vindas
+      const welcomeMessage: ChatMessage = {
+        id: Date.now().toString(),
+        content: `Olá ${currentUserProfile.name}! 😊 Sou ${currentAgent.name}, ${currentAgent.title}. ${currentAgent.description}. Como posso te ajudar hoje?`,
+        sender: 'agent',
+        timestamp: new Date(),
+        agentId: currentAgent.id
+      };
+      setMessages([welcomeMessage]);
+      toast.success('Conversa apagada com sucesso!');
+    }
+  };
+
   console.log('Rendering chat with', messages.length, 'messages');
 
   return (
@@ -502,6 +518,16 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
             <h2 className="text-base font-medium truncate">{currentAgent.name}</h2>
             <p className="text-white/90 text-xs truncate">Online agora</p>
           </div>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClearChat}
+            className="text-white hover:bg-white/20 p-1.5"
+            title="Apagar conversa"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 

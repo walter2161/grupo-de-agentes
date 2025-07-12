@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, MicOff, ArrowLeft, Users, AtSign } from 'lucide-react';
+import { Send, Mic, MicOff, ArrowLeft, Users, AtSign, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -215,6 +215,23 @@ Como podemos te ajudar hoje?`,
     setInputMessage(prev => prev + `@${agentName} `);
   };
 
+  const handleClearChat = () => {
+    if (window.confirm('Tem certeza que deseja apagar toda a conversa do grupo? Esta ação não pode ser desfeita.')) {
+      setMessages([]);
+      // Reinicia a conversa com mensagem de boas-vindas do grupo
+      const welcomeMessage: GroupMessage = {
+        id: Date.now().toString(),
+        content: `🎉 Bem-vindos ao grupo ${group.name}! Aqui você pode conversar com nossos especialistas: ${groupAgents.map(a => a.name).join(', ')}. O que gostariam de discutir hoje?`,
+        sender: 'agent',
+        senderName: 'Sistema',
+        timestamp: new Date(),
+        groupId: group.id
+      };
+      setMessages([welcomeMessage]);
+      toast.success('Conversa do grupo apagada com sucesso!');
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
@@ -241,6 +258,15 @@ Como podemos te ajudar hoje?`,
           </div>
 
           <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearChat}
+              className="text-white hover:bg-white/20 p-2"
+              title="Apagar conversa do grupo"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
             <Users className="h-4 w-4" />
             <span className="text-sm">{groupAgents.length}</span>
           </div>

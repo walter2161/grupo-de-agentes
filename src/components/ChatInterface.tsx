@@ -1,12 +1,13 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, MicOff } from 'lucide-react';
+import { Send, Mic, MicOff, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { mistralService, MistralMessage } from '@/services/mistralService';
 import { PsychologistAvatar } from './PsychologistAvatar';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { PsychologistProfile } from '@/types';
+import { toast } from 'sonner';
 
 interface Message {
   id: string;
@@ -121,16 +122,40 @@ export const ChatInterface = () => {
     // Por enquanto, apenas simula o estado
   };
 
+  const handleClearChat = () => {
+    if (window.confirm('Tem certeza que deseja apagar toda a conversa? Esta ação não pode ser desfeita.')) {
+      setMessages([]);
+      // Reinicia a conversa com mensagem de boas-vindas
+      const welcomeMessage: Message = {
+        id: Date.now().toString(),
+        content: `Olá! 😊 Sou ${profile.name}, seu psicólogo virtual. Estou aqui para te ouvir e te ajudar. Como você está se sentindo hoje? Gostaria de me contar o que trouxe você até aqui?`,
+        sender: 'psychologist',
+        timestamp: new Date()
+      };
+      setMessages([welcomeMessage]);
+      toast.success('Conversa apagada com sucesso!');
+    }
+  };
+
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
       {/* Header com Avatar */}
       <div className="bg-gradient-to-r from-teal-600 to-blue-600 text-white p-6 rounded-t-lg">
         <div className="flex items-center space-x-4">
           <PsychologistAvatar emotion={currentEmotion} />
-          <div>
+          <div className="flex-1">
             <h2 className="text-xl font-semibold">{profile.name}</h2>
             <p className="text-teal-100">{profile.specialty} • Sempre disponível</p>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClearChat}
+            className="text-white hover:bg-white/20 p-2"
+            title="Apagar conversa"
+          >
+            <Trash2 className="h-5 w-5" />
+          </Button>
         </div>
       </div>
 
