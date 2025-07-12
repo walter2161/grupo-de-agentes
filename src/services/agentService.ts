@@ -42,7 +42,8 @@ class AgentService {
     message: string, 
     conversationHistory: MistralMessage[], 
     agent: Agent,
-    userProfile?: UserProfile
+    userProfile?: UserProfile,
+    agentContext?: string
   ): Promise<string> {
     if (!this.apiKey) {
       throw new Error('Chave da API Mistral não configurada');
@@ -56,9 +57,16 @@ Email: ${userProfile.email || 'Não informado'}
 Adapte sua comunicação ao perfil do usuário e trate-o pelo nome sempre que apropriado.
 ` : '';
 
+    const contextInfo = agentContext ? `
+CONTEXTO DA SUA SALA VIRTUAL E MEMÓRIA:
+${agentContext}
+` : '';
+
     const systemPrompt = `Você é ${agent.name}, ${agent.title}.
 
 ${userInfo}
+
+${contextInfo}
 
 SUA ESPECIALIDADE: ${agent.specialty}
 SUA EXPERIÊNCIA: ${agent.experience}

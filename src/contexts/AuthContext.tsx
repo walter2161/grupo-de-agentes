@@ -23,14 +23,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('chathy-users', JSON.stringify([defaultUser]));
     }
 
-    // Verificar se há uma sessão ativa
+    // Verificar se há uma sessão ativa e se ainda é válida (24h)
     const currentUser = localStorage.getItem('chathy-current-user');
-    if (currentUser) {
-      const userData = JSON.parse(currentUser);
-      setUser(userData);
+    const sessionExpiry = localStorage.getItem('chathy-session-expiry');
+    
+    if (currentUser && sessionExpiry) {
+      const now = new Date().getTime();
+      const expiryTime = parseInt(sessionExpiry);
       
-      // Sincronizar perfil do usuário com os dados de autenticação
-      syncUserProfile(userData);
+      if (now < expiryTime) {
+        // Sessão ainda válida
+        const userData = JSON.parse(currentUser);
+        setUser(userData);
+        syncUserProfile(userData);
+      } else {
+        // Sessão expirada, limpar
+        localStorage.removeItem('chathy-current-user');
+        localStorage.removeItem('chathy-session-expiry');
+      }
     }
   }, []);
 
@@ -58,6 +68,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (foundUser) {
       setUser(foundUser);
       localStorage.setItem('chathy-current-user', JSON.stringify(foundUser));
+      
+      // Definir expiração da sessão para 24 horas
+      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+      localStorage.setItem('chathy-session-expiry', expiryTime.toString());
+      
       syncUserProfile(foundUser);
       return true;
     }
@@ -86,6 +101,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     setUser(newUser);
     localStorage.setItem('chathy-current-user', JSON.stringify(newUser));
+    
+    // Definir expiração da sessão para 24 horas
+    const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+    localStorage.setItem('chathy-session-expiry', expiryTime.toString());
+    
     syncUserProfile(newUser);
     return true;
   };
@@ -93,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('chathy-current-user');
+    localStorage.removeItem('chathy-session-expiry');
     // Os dados específicos do usuário permanecem no localStorage para quando ele logar novamente
     // O novo hook useUserStorage irá carregar os dados corretos automaticamente
   };

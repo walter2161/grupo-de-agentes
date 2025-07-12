@@ -1,12 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, Settings, Users, LogOut } from 'lucide-react';
+import { MessageCircle, Settings, Users, LogOut, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AgentPortal } from '@/components/AgentPortal';
 import { AgentChat } from '@/components/AgentChat';
 import { AdminPanel } from '@/components/AdminPanel';
 import { GroupPortal } from '@/components/GroupPortal';
 import { GroupChat } from '@/components/GroupChat';
+import { QuickActionsMenu } from '@/components/QuickActionsMenu';
+import { PersonaManager } from '@/components/PersonaManager';
+import { GroupCreator } from '@/components/GroupCreator';
 import { Agent, defaultAgents } from '@/types/agents';
 import { Group, defaultGroups } from '@/types/groups';
 import { UserProfile, defaultUserProfile } from '@/types/user';
@@ -14,9 +17,10 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState<'portal' | 'chat' | 'config' | 'groups' | 'group-chat'>('portal');
+  const [activeTab, setActiveTab] = useState<'portal' | 'chat' | 'config' | 'groups' | 'group-chat' | 'create-agent' | 'create-group'>('portal');
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [showQuickActions, setShowQuickActions] = useState(false);
   const [agents] = useLocalStorage<Agent[]>('agents', defaultAgents);
   const [groups] = useLocalStorage<Group[]>('groups', defaultGroups);
   const [userProfile] = useLocalStorage<UserProfile>('user-profile', defaultUserProfile);
@@ -42,16 +46,36 @@ const Index = () => {
     setActiveTab('groups');
   };
 
+  const handleCreateAgent = () => {
+    setActiveTab('create-agent');
+  };
+
+  const handleCreateGroup = () => {
+    setActiveTab('create-group');
+  };
+
+  const handleViewChats = () => {
+    setActiveTab('portal');
+  };
+
+  const handleAgentCreated = () => {
+    setActiveTab('portal');
+  };
+
+  const handleGroupCreated = () => {
+    setActiveTab('groups');
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'portal':
-        return <AgentPortal onAgentSelect={handleAgentSelect} />;
+        return <AgentPortal onAgentSelect={handleAgentSelect} onCreateAgent={handleCreateAgent} />;
       case 'chat':
         if (selectedAgent) {
           const currentAgent = agents.find(a => a.id === selectedAgent.id) || selectedAgent;
           return <AgentChat agent={currentAgent} onBack={handleBackToPortal} userProfile={userProfile} />;
         } else {
-          return <AgentPortal onAgentSelect={handleAgentSelect} />;
+          return <AgentPortal onAgentSelect={handleAgentSelect} onCreateAgent={handleCreateAgent} />;
         }
       case 'groups':
         return <GroupPortal onGroupSelect={handleGroupSelect} />;
@@ -62,10 +86,14 @@ const Index = () => {
         } else {
           return <GroupPortal onGroupSelect={handleGroupSelect} />;
         }
+      case 'create-agent':
+        return <PersonaManager />;
+      case 'create-group':
+        return <GroupCreator agents={agents} onCreateGroup={handleGroupCreated} onCancel={() => setActiveTab('groups')} />;
       case 'config':
         return <AdminPanel />;
       default:
-        return <AgentPortal onAgentSelect={handleAgentSelect} />;
+        return <AgentPortal onAgentSelect={handleAgentSelect} onCreateAgent={handleCreateAgent} />;
     }
   };
 
@@ -192,6 +220,25 @@ const Index = () => {
           </div>
         </div>
       </header>
+
+      {/* Floating Action Button */}
+      {(activeTab === 'portal' || activeTab === 'groups') && (
+        <Button
+          onClick={() => setShowQuickActions(true)}
+          className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg hover:shadow-xl transition-all duration-200"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      )}
+
+      {/* Quick Actions Menu */}
+      <QuickActionsMenu
+        isOpen={showQuickActions}
+        onClose={() => setShowQuickActions(false)}
+        onCreateAgent={handleCreateAgent}
+        onCreateGroup={handleCreateGroup}
+        onViewChats={handleViewChats}
+      />
 
       {/* Main Content */}
       <main className={`${activeTab === 'chat' || activeTab === 'group-chat' ? 'h-[calc(100vh-5rem)]' : ''} ${activeTab === 'config' ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'} relative z-10`}>

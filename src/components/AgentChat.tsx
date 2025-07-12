@@ -9,6 +9,7 @@ import { Agent } from '@/types/agents';
 import { ChatMessage } from '@/types/agents';
 import { UserProfile } from '@/types/user';
 import { useUserStorage } from '@/hooks/useUserStorage';
+import { useAgentMemory } from '@/hooks/useAgentMemory';
 import { EmojiPicker } from '@/components/EmojiPicker';
 import { AgentAvatar } from '@/components/AgentAvatar';
 import { ImageUploader } from '@/components/ImageUploader';
@@ -34,6 +35,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
   const [isProcessingAudio, setIsProcessingAudio] = useState(false);
   const [agentInteractions, setAgentInteractions] = useUserStorage<AgentInteractionCount[]>('agent-interactions', []);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { memory, addConversationEntry, getContextForAgent } = useAgentMemory(agent.id);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -131,9 +133,12 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
     // Gerencia histórico limitado
     const managedMessages = checkUserLimits.manageChatHistory(messagesWithUser);
     
-    // Solicita scroll automático ao enviar mensagem
-    shouldAutoScrollRef.current = true;
-    setMessages(managedMessages);
+      // Solicita scroll automático ao enviar mensagem
+      shouldAutoScrollRef.current = true;
+      setMessages(managedMessages);
+      
+      // Adicionar à memória do agente
+      addConversationEntry(messagesWithUser[messagesWithUser.length - 1]);
     
     setInputMessage('');
     setIsLoading(true);
@@ -149,7 +154,9 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
       const currentDateTime = checkUserLimits.getCurrentDateTime();
       const contextualInput = `[Data/Hora atual: ${currentDateTime}] ${inputMessage}`;
 
-      const response = await agentService.getAgentResponse(contextualInput, conversationHistory, currentAgent, currentUserProfile);
+      // Adicionar contexto da sala virtual e memória do agente
+      const agentContext = getContextForAgent();
+      const response = await agentService.getAgentResponse(contextualInput, conversationHistory, currentAgent, currentUserProfile, agentContext);
       
       // Divide a resposta do agente se necessário
       const responseParts = checkUserLimits.splitLongAgentMessage(response);
@@ -187,6 +194,9 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
       // Solicita scroll automático ao receber resposta
       shouldAutoScrollRef.current = true;
       setMessages(finalManagedMessages);
+      
+      // Adicionar resposta do agente à memória
+      addConversationEntry(finalMessages[finalMessages.length - 1]);
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
       const errorMessage: ChatMessage = {

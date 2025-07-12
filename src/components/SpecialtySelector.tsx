@@ -32,7 +32,18 @@ const specialties = [
   'Música',
   'Turismo',
   'Veterinária',
-  'Farmácia'
+  'Farmácia',
+  'Personagem Fictício',
+  'Cientista',
+  'Escritor',
+  'Filósofo',
+  'Artista',
+  'Cozinheiro',
+  'Aventureiro',
+  'Super-Herói',
+  'Desenho Animado',
+  'Celebridade',
+  'Histórico'
 ];
 
 interface SpecialtySelectorProps {
@@ -49,7 +60,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Selecione uma especialidade" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="max-h-60 overflow-y-auto">
         {specialties.map((specialty) => (
           <SelectItem key={specialty} value={specialty}>
             {specialty}
