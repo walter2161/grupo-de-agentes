@@ -11,33 +11,6 @@ export interface MistralMessage {
 class AgentService {
   private apiKey = 'UEPqczZDK2ldyBmVYCJHJjIPZstU3WaJ';
   private baseUrl = 'https://api.mistral.ai/v1/chat/completions';
-  private pixabayApiKey = '12712829-23e1034c69e0a7c6119bcaaec';
-  private pixabayBaseUrl = 'https://pixabay.com/api/';
-
-  private async searchPixabayImage(query: string): Promise<string | null> {
-    try {
-      const response = await fetch(
-        `${this.pixabayBaseUrl}?key=${this.pixabayApiKey}&q=${encodeURIComponent(query)}&image_type=photo&orientation=horizontal&min_width=400&min_height=300&per_page=3&safesearch=true`
-      );
-      
-      if (!response.ok) {
-        console.error('Erro na API do Pixabay:', response.status);
-        return null;
-      }
-      
-      const data = await response.json();
-      
-      if (data.hits && data.hits.length > 0) {
-        // Retorna a primeira imagem encontrada
-        return data.hits[0].webformatURL;
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('Erro ao buscar imagem no Pixabay:', error);
-      return null;
-    }
-  }
 
   async getAgentResponse(
     message: string, 
@@ -84,11 +57,12 @@ CONHECIMENTO ESPECÍFICO:
 ${agent.documentation}
 
 CAPACIDADES ESPECIAIS DE IMAGEM:
-- Você TEM ACESSO a um sistema de geração de imagens com IA integrado
+- Você TEM ACESSO a um sistema de geração de imagens com IA integrado do Google AI Studio
 - Quando o usuário pedir uma imagem criativa/personalizada, use: [GERAR_IMAGEM: descrição detalhada da imagem]
-- Para buscar imagens existentes, use: [ENVIAR_IMAGEM: descrição da imagem]
-- Exemplos: [GERAR_IMAGEM: retrato futurista de um robô] ou [ENVIAR_IMAGEM: paisagem montanha]
-- Use GERAR_IMAGEM para criações artísticas únicas e ENVIAR_IMAGEM para fotos convencionais
+- Para enviar imagens, use: [ENVIAR_IMAGEM: descrição da imagem]
+- Ambos os comandos agora geram imagens usando IA, não buscam imagens existentes
+- Exemplos: [GERAR_IMAGEM: retrato futurista de um robô] ou [ENVIAR_IMAGEM: Homer Simpson]
+- Use GERAR_IMAGEM para criações artísticas únicas e ENVIAR_IMAGEM para representações fotográficas
 
 INFORMAÇÕES TEMPORAIS:
 - Você tem conhecimento da data e hora atual: ${new Date().toLocaleString('pt-BR', {
@@ -117,7 +91,7 @@ INSTRUÇÕES:
 4. Se o usuário tiver nome, use-o na conversa de forma natural
 5. Seja empático e compreensivo
 6. Forneça respostas práticas e úteis
-7. QUANDO solicitado uma imagem, use o formato [ENVIAR_IMAGEM: descrição]
+7. QUANDO solicitado uma imagem, use o formato [GERAR_IMAGEM: descrição] ou [ENVIAR_IMAGEM: descrição]
 8. Se não souber algo específico, seja honesto sobre suas limitações
 
 Responda de forma natural e profissional:`;
@@ -174,19 +148,28 @@ Responda de forma natural e profissional:`;
         }
       }
       
-      // Processa comandos de busca de imagem existente
+      // Processa comandos de busca de imagem existente - agora também usa Google AI
       const searchImageMatch = responseContent.match(/\[ENVIAR_IMAGEM:\s*([^\]]+)\]/);
       if (searchImageMatch) {
         const imageDescription = searchImageMatch[1].trim();
-        const imageUrl = await this.searchPixabayImage(imageDescription);
-        
-        if (imageUrl) {
-          // Remove o comando da resposta e adiciona a imagem
+        try {
+          const optimizedPrompt = await googleAIImageService.generateOptimizedPrompt(
+            imageDescription, 
+            `${agent.name} - ${agent.specialty}`
+          );
+          
+          const imageResponse = await googleAIImageService.generateImage({
+            prompt: optimizedPrompt,
+            style: 'photographic',
+            aspectRatio: '16:9',
+            quality: 'hd'
+          });
+          
           responseContent = responseContent.replace(searchImageMatch[0], '').trim();
-          responseContent += `\n\n[IMAGEM_ENVIADA:${imageUrl}]`;
-        } else {
-          // Se não encontrar imagem, informa o usuário
-          responseContent = responseContent.replace(searchImageMatch[0], 'Desculpe, não consegui encontrar uma imagem adequada para sua solicitação.').trim();
+          responseContent += `\n\n[IMAGEM_ENVIADA:${imageResponse.imageUrl}]`;
+        } catch (error) {
+          console.error('Erro ao gerar imagem:', error);
+          responseContent = responseContent.replace(searchImageMatch[0], 'Desculpe, não consegui gerar a imagem solicitada no momento.').trim();
         }
       }
       
