@@ -172,16 +172,18 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
         if (generatedImageMatch) {
           imageUrl = generatedImageMatch[1];
           finalContent = part.replace(generatedImageMatch[0], '').trim();
+          console.log('Imagem gerada processada:', imageUrl);
         }
         
-        // Verifica se há imagem enviada do Pixabay
+        // Verifica se há imagem enviada
         const sentImageMatch = part.match(/\[IMAGEM_ENVIADA:([^\]]+)\]/);
         if (sentImageMatch) {
           imageUrl = sentImageMatch[1];
           finalContent = part.replace(sentImageMatch[0], '').trim();
+          console.log('Imagem enviada processada:', imageUrl);
         }
 
-        return {
+        const message = {
           id: (Date.now() + index + 1).toString(),
           content: finalContent,
           sender: 'agent' as const,
@@ -189,6 +191,9 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
           agentId: agent.id,
           imageUrl: imageUrl || undefined
         };
+        
+        console.log('Mensagem criada:', message);
+        return message;
       });
 
       console.log('Adding agent responses:', agentMessages);
