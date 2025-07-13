@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Settings, User, MessageSquare, Download, BookOpen, Calendar, Trophy, Plus, Edit, Trash2, UserCog, RotateCcw } from 'lucide-react';
+import { Settings, User, MessageSquare, Download, BookOpen, Calendar, Trophy, Plus, Edit, Trash2, UserCog, RotateCcw, Bot } from 'lucide-react';
 import { useUserStorage } from '@/hooks/useUserStorage';
 import { Message, ConsultationProtocol } from '@/types';
 import { Agent, defaultAgents } from '@/types/agents';
@@ -302,35 +302,53 @@ export const AdminPanel = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">Descrição</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-sm font-medium text-foreground">Descrição</label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const generatedContent = `Esta é uma descrição gerada automaticamente para ${selectedAgent.name}, especialista em ${selectedAgent.specialty}. Com ${selectedAgent.experience}, utiliza abordagem ${selectedAgent.approach} para proporcionar atendimento de qualidade.`;
+                          setSelectedAgent({ ...selectedAgent, description: generatedContent });
+                        }}
+                        className="h-6 w-6 p-0"
+                      >
+                        <Bot className="h-3 w-3" />
+                      </Button>
+                    </div>
                     <Textarea
                       value={selectedAgent.description}
                       onChange={(e) => setSelectedAgent({ ...selectedAgent, description: e.target.value })}
                       rows={3}
                     />
                   </div>
+                  
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-sm font-medium text-foreground">Persona</label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const generatedPersona = `Sou ${selectedAgent.name}, ${selectedAgent.title} especializado em ${selectedAgent.specialty}. Tenho um estilo profissional e empático, sempre buscando criar um ambiente acolhedor e seguro para nossos diálogos. Minha comunicação é clara e respeitosa, adaptando-me às necessidades específicas de cada pessoa.`;
+                          setSelectedAgent({ ...selectedAgent, personaStyle: generatedPersona });
+                        }}
+                        className="h-6 w-6 p-0"
+                      >
+                        <Bot className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <Textarea
+                      value={selectedAgent.personaStyle || ''}
+                      onChange={(e) => setSelectedAgent({ ...selectedAgent, personaStyle: e.target.value })}
+                      rows={3}
+                      placeholder="Como o agente deve se comportar..."
+                    />
+                  </div>
                 </div>
               </div>
-              
-              <AIContentGenerator
-                agentData={{
-                  name: selectedAgent.name,
-                  title: selectedAgent.title,
-                  specialty: selectedAgent.specialty,
-                  description: selectedAgent.description,
-                  experience: selectedAgent.experience,
-                  approach: selectedAgent.approach,
-                  guidelines: selectedAgent.guidelines,
-                  personaStyle: selectedAgent.personaStyle,
-                  documentation: selectedAgent.documentation,
-                }}
-                onContentGenerated={(content) => {
-                  setSelectedAgent({ 
-                    ...selectedAgent, 
-                    ...content 
-                  });
-                }}
-              />
               
               <div className="space-y-4">
                 <div>
@@ -404,31 +422,6 @@ export const AdminPanel = () => {
                 />
               </div>
               
-              <AIContentGenerator
-                agentData={{
-                  name: selectedAgent.name,
-                  title: selectedAgent.title,
-                  specialty: selectedAgent.specialty,
-                  description: selectedAgent.description,
-                  experience: selectedAgent.experience,
-                  approach: selectedAgent.approach,
-                  guidelines: selectedAgent.guidelines,
-                  personaStyle: selectedAgent.personaStyle,
-                  documentation: selectedAgent.documentation,
-                }}
-                onContentGenerated={(content) => {
-                  console.log('Callback executado com conteúdo:', content);
-                  console.log('Estado atual do agente:', selectedAgent);
-                  
-                  const updatedAgent = { 
-                    ...selectedAgent, 
-                    ...content 
-                  };
-                  
-                  console.log('Agente atualizado:', updatedAgent);
-                  setSelectedAgent(updatedAgent);
-                }}
-              />
               <Button onClick={handleSaveAgent} className="w-full">Salvar Diretrizes</Button>
             </CardContent>
           </Card>
