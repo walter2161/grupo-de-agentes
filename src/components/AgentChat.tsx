@@ -19,7 +19,7 @@ import { checkUserLimits, DEFAULT_USER_LIMITS, AgentInteractionCount } from '@/t
 import { ImageRenderer } from './ImageRenderer';
 import { toast } from 'sonner';
 import * as Icons from 'lucide-react';
-import { googleAIImageService } from '@/services/googleAIImageService';
+
 
 interface AgentChatProps {
   agent: Agent;
@@ -164,68 +164,17 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
       const responseParts = checkUserLimits.splitLongAgentMessage(response);
       
       // Cria mensagens para cada parte da resposta
-      const agentMessages: ChatMessage[] = [];
-      
-      for (let index = 0; index < responseParts.length; index++) {
-        const part = responseParts[index];
-        let finalContent = part;
-        let imageUrl = null;
-        
-        console.log('Processando parte da resposta:', part);
-        
-        // Detecta solicitações de imagem na resposta do agente
-        const imageRequestPatterns = [
-          /\[IMAGEM_GERADA:/,
-          /\[IMAGEM_ENVIADA:/,
-          /enviando uma imagem/i,
-          /aqui está.*imagem/i,
-          /vou gerar.*imagem/i,
-          /uma.*imagem.*da/i
-        ];
-
-        const hasImageRequest = imageRequestPatterns.some(pattern => 
-          pattern.test(part)
-        );
-
-        if (hasImageRequest) {
-          try {
-            // Remove códigos de imagem da mensagem se existirem
-            finalContent = part.replace(/\[IMAGEM_(?:GERADA|ENVIADA):[^\]]*\]/gs, '').trim();
-            
-            // Gera a imagem usando o mesmo serviço do avatar
-            const imageResponse = await googleAIImageService.generateImage({
-              prompt: inputMessage, // Usa a solicitação original do usuário
-              style: 'realistic',
-              aspectRatio: '1:1',
-              quality: 'standard'
-            });
-            
-            imageUrl = imageResponse.imageUrl;
-            console.log('Imagem gerada com sucesso:', imageUrl?.substring(0, 50) + '...');
-          } catch (error) {
-            console.error('Erro ao gerar imagem:', error);
-            finalContent += "\n\nDesculpe, não consegui gerar a imagem no momento. Tente novamente.";
-          }
-        }
-
+      const agentMessages: ChatMessage[] = responseParts.map((part, index) => {
         const message = {
           id: (Date.now() + index + 1).toString(),
-          content: finalContent,
+          content: part,
           sender: 'agent' as const,
           timestamp: new Date(),
-          agentId: agent.id,
-          imageUrl: imageUrl || undefined
+          agentId: agent.id
         };
         
-        console.log('Mensagem final criada:', {
-          id: message.id,
-          hasImage: !!message.imageUrl,
-          imagePreview: message.imageUrl?.substring(0, 50) + '...',
-          content: message.content.substring(0, 100) + '...'
-        });
-        
-        agentMessages.push(message);
-      }
+        return message;
+      });
 
       console.log('Adding agent responses:', agentMessages);
       // Agora adiciona as respostas do agente
@@ -603,17 +552,6 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
                     <source src={message.audioUrl} type="audio/wav" />
                     Seu navegador não suporta áudio.
                   </audio>
-                </div>
-              )}
-              
-              {/* Exibe imagem enviada pelo agente */}
-              {message.imageUrl && (
-                <div className="mt-2">
-                  <ImageRenderer
-                    imageUrl={message.imageUrl}
-                    alt="Imagem enviada pelo agente"
-                    className="w-full max-w-48 rounded-lg shadow-sm"
-                  />
                 </div>
               )}
               

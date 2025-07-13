@@ -21,7 +21,7 @@ export interface ChatMessage {
   sender: 'user' | 'agent';
   timestamp: Date;
   agentId: string;
-  imageUrl?: string;
+  
   audioUrl?: string;
 }
 
