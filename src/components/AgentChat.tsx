@@ -16,6 +16,7 @@ import { ImageUploader } from '@/components/ImageUploader';
 import { defaultAgents } from '@/types/agents';
 import { defaultUserProfile } from '@/types/user';
 import { checkUserLimits, DEFAULT_USER_LIMITS, AgentInteractionCount } from '@/types/userLimits';
+import { ImageRenderer } from './ImageRenderer';
 import { toast } from 'sonner';
 import * as Icons from 'lucide-react';
 
@@ -167,20 +168,47 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
         let finalContent = part;
         let imageUrl = null;
         
-        // Verifica se há imagem gerada com IA
-        const generatedImageMatch = part.match(/\[IMAGEM_GERADA:([^\]]+)\]/);
+        console.log('Processando parte da resposta:', part);
+        
+        // Regex mais robusta para capturar imagens base64 completas (inclui quebras de linha)
+        const generatedImageMatch = part.match(/\[IMAGEM_GERADA:(data:image\/[^;]+;base64,[^\]]+)\]/s);
         if (generatedImageMatch) {
           imageUrl = generatedImageMatch[1];
           finalContent = part.replace(generatedImageMatch[0], '').trim();
-          console.log('Imagem gerada processada:', imageUrl);
+          console.log('Imagem gerada encontrada, URL:', imageUrl?.substring(0, 50) + '...');
         }
         
-        // Verifica se há imagem enviada
-        const sentImageMatch = part.match(/\[IMAGEM_ENVIADA:([^\]]+)\]/);
+        // Regex mais robusta para imagens enviadas (URLs normais ou base64)
+        const sentImageMatch = part.match(/\[IMAGEM_ENVIADA:([^\]]+)\]/s);
         if (sentImageMatch) {
           imageUrl = sentImageMatch[1];
           finalContent = part.replace(sentImageMatch[0], '').trim();
-          console.log('Imagem enviada processada:', imageUrl);
+          console.log('Imagem enviada encontrada, URL:', imageUrl?.substring(0, 50) + '...');
+        }
+
+        // Se ainda há códigos de imagem não processados, tenta extrair manualmente
+        if (!imageUrl && part.includes('[IMAGEM_')) {
+          console.log('Tentando extração manual de imagem...');
+          
+          // Procura especificamente por data:image em qualquer lugar do texto
+          const dataImageMatch = part.match(/(data:image\/[^;]+;base64,[A-Za-z0-9+/=]+)/);
+          if (dataImageMatch) {
+            imageUrl = dataImageMatch[1];
+            // Remove tanto o comando quanto a data URL do conteúdo
+            finalContent = part
+              .replace(/\[IMAGEM_(?:GERADA|ENVIADA):[^\]]*\]/g, '')
+              .replace(dataImageMatch[0], '')
+              .trim();
+            console.log('Data URL extraída manualmente:', imageUrl.substring(0, 50) + '...');
+          } else {
+            // Fallback para qualquer padrão de imagem restante
+            const fallbackMatch = part.match(/\[IMAGEM_(?:GERADA|ENVIADA):(.*?)\]/s);
+            if (fallbackMatch) {
+              imageUrl = fallbackMatch[1];
+              finalContent = part.replace(fallbackMatch[0], '').trim();
+              console.log('Imagem extraída com fallback:', imageUrl?.substring(0, 50) + '...');
+            }
+          }
         }
 
         const message = {
@@ -192,7 +220,13 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
           imageUrl: imageUrl || undefined
         };
         
-        console.log('Mensagem criada:', message);
+        console.log('Mensagem final criada:', {
+          id: message.id,
+          hasImage: !!message.imageUrl,
+          imagePreview: message.imageUrl?.substring(0, 50) + '...',
+          content: message.content.substring(0, 100) + '...'
+        });
+        
         return message;
       });
 
@@ -578,9 +612,9 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
               {/* Exibe imagem enviada pelo agente */}
               {message.imageUrl && (
                 <div className="mt-2">
-                  <img 
-                    src={message.imageUrl} 
-                    alt="Imagem enviada pelo agente" 
+                  <ImageRenderer
+                    imageUrl={message.imageUrl}
+                    alt="Imagem enviada pelo agente"
                     className="w-full max-w-48 rounded-lg shadow-sm"
                   />
                 </div>
