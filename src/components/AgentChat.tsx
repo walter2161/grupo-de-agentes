@@ -19,6 +19,7 @@ import { checkUserLimits, DEFAULT_USER_LIMITS, AgentInteractionCount } from '@/t
 import { ImageRenderer } from './ImageRenderer';
 import { toast } from 'sonner';
 import * as Icons from 'lucide-react';
+import { googleAIImageService } from '@/services/googleAIImageService';
 
 interface AgentChatProps {
   agent: Agent;
@@ -163,51 +164,47 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
       const responseParts = checkUserLimits.splitLongAgentMessage(response);
       
       // Cria mensagens para cada parte da resposta
-      const agentMessages: ChatMessage[] = responseParts.map((part, index) => {
-        // Processa cada parte para verificar se contém imagem
+      const agentMessages: ChatMessage[] = [];
+      
+      for (let index = 0; index < responseParts.length; index++) {
+        const part = responseParts[index];
         let finalContent = part;
         let imageUrl = null;
         
         console.log('Processando parte da resposta:', part);
         
-        // Regex mais robusta para capturar imagens base64 completas (inclui quebras de linha)
-        const generatedImageMatch = part.match(/\[IMAGEM_GERADA:(data:image\/[^;]+;base64,[^\]]+)\]/s);
-        if (generatedImageMatch) {
-          imageUrl = generatedImageMatch[1];
-          finalContent = part.replace(generatedImageMatch[0], '').trim();
-          console.log('Imagem gerada encontrada, URL:', imageUrl?.substring(0, 50) + '...');
-        }
-        
-        // Regex mais robusta para imagens enviadas (URLs normais ou base64)
-        const sentImageMatch = part.match(/\[IMAGEM_ENVIADA:([^\]]+)\]/s);
-        if (sentImageMatch) {
-          imageUrl = sentImageMatch[1];
-          finalContent = part.replace(sentImageMatch[0], '').trim();
-          console.log('Imagem enviada encontrada, URL:', imageUrl?.substring(0, 50) + '...');
-        }
+        // Detecta solicitações de imagem na resposta do agente
+        const imageRequestPatterns = [
+          /\[IMAGEM_GERADA:/,
+          /\[IMAGEM_ENVIADA:/,
+          /enviando uma imagem/i,
+          /aqui está.*imagem/i,
+          /vou gerar.*imagem/i,
+          /uma.*imagem.*da/i
+        ];
 
-        // Se ainda há códigos de imagem não processados, tenta extrair manualmente
-        if (!imageUrl && part.includes('[IMAGEM_')) {
-          console.log('Tentando extração manual de imagem...');
-          
-          // Procura especificamente por data:image em qualquer lugar do texto
-          const dataImageMatch = part.match(/(data:image\/[^;]+;base64,[A-Za-z0-9+/=]+)/);
-          if (dataImageMatch) {
-            imageUrl = dataImageMatch[1];
-            // Remove tanto o comando quanto a data URL do conteúdo
-            finalContent = part
-              .replace(/\[IMAGEM_(?:GERADA|ENVIADA):[^\]]*\]/g, '')
-              .replace(dataImageMatch[0], '')
-              .trim();
-            console.log('Data URL extraída manualmente:', imageUrl.substring(0, 50) + '...');
-          } else {
-            // Fallback para qualquer padrão de imagem restante
-            const fallbackMatch = part.match(/\[IMAGEM_(?:GERADA|ENVIADA):(.*?)\]/s);
-            if (fallbackMatch) {
-              imageUrl = fallbackMatch[1];
-              finalContent = part.replace(fallbackMatch[0], '').trim();
-              console.log('Imagem extraída com fallback:', imageUrl?.substring(0, 50) + '...');
-            }
+        const hasImageRequest = imageRequestPatterns.some(pattern => 
+          pattern.test(part)
+        );
+
+        if (hasImageRequest) {
+          try {
+            // Remove códigos de imagem da mensagem se existirem
+            finalContent = part.replace(/\[IMAGEM_(?:GERADA|ENVIADA):[^\]]*\]/gs, '').trim();
+            
+            // Gera a imagem usando o mesmo serviço do avatar
+            const imageResponse = await googleAIImageService.generateImage({
+              prompt: inputMessage, // Usa a solicitação original do usuário
+              style: 'realistic',
+              aspectRatio: '1:1',
+              quality: 'standard'
+            });
+            
+            imageUrl = imageResponse.imageUrl;
+            console.log('Imagem gerada com sucesso:', imageUrl?.substring(0, 50) + '...');
+          } catch (error) {
+            console.error('Erro ao gerar imagem:', error);
+            finalContent += "\n\nDesculpe, não consegui gerar a imagem no momento. Tente novamente.";
           }
         }
 
@@ -227,8 +224,8 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agent, onBack, userProfile
           content: message.content.substring(0, 100) + '...'
         });
         
-        return message;
-      });
+        agentMessages.push(message);
+      }
 
       console.log('Adding agent responses:', agentMessages);
       // Agora adiciona as respostas do agente
