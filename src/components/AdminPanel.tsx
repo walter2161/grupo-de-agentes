@@ -388,7 +388,19 @@ export const AdminPanel = () => {
                 </div>
               </div>
               
-              <Button onClick={handleSaveAgent} className="w-full">Salvar Perfil</Button>
+              <div className="flex gap-3">
+                <Button onClick={handleSaveAgent} className="flex-1">Salvar Perfil</Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSelectedAgent(null);
+                    setActiveTab('agents');
+                  }}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+              </div>
             </CardContent>
           </Card>
         );
@@ -422,7 +434,19 @@ export const AdminPanel = () => {
                 />
               </div>
               
-              <Button onClick={handleSaveAgent} className="w-full">Salvar Diretrizes</Button>
+              <div className="flex gap-3">
+                <Button onClick={handleSaveAgent} className="flex-1">Salvar Diretrizes</Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSelectedAgent(null);
+                    setActiveTab('agents');
+                  }}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+              </div>
             </CardContent>
           </Card>
         );
@@ -475,7 +499,19 @@ export const AdminPanel = () => {
                   });
                 }}
               />
-              <Button onClick={handleSaveAgent} className="w-full">Salvar Estilo</Button>
+              <div className="flex gap-3">
+                <Button onClick={handleSaveAgent} className="flex-1">Salvar Estilo</Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSelectedAgent(null);
+                    setActiveTab('agents');
+                  }}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+              </div>
             </CardContent>
           </Card>
         );
@@ -556,7 +592,19 @@ export const AdminPanel = () => {
                   });
                 }}
               />
-              <Button onClick={handleSaveAgent} className="w-full">Salvar Documentação</Button>
+              <div className="flex gap-3">
+                <Button onClick={handleSaveAgent} className="flex-1">Salvar Documentação</Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSelectedAgent(null);
+                    setActiveTab('agents');
+                  }}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+              </div>
             </CardContent>
           </Card>
         );
