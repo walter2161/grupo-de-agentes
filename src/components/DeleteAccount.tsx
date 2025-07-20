@@ -70,35 +70,9 @@ export const DeleteAccount = () => {
       handleExportData();
     }
 
-    // Simular deleção da conta (limpar apenas dados do usuário)
+    // Simular deleção da conta (limpar localStorage)
     setTimeout(() => {
-      // Lista de chaves específicas do usuário que podem ser apagadas com segurança
-      const userDataKeys = [
-        'agents',
-        'groups', 
-        'user-profile',
-        'agent-interactions',
-        'consultation-protocols'
-      ];
-      
-      // Apagar chaves que começam com prefixos específicos
-      const prefixesToClear = ['chat-history-', 'group-chat-'];
-      
-      // Obter todas as chaves do localStorage
-      const allKeys = Object.keys(localStorage);
-      
-      // Apagar apenas chaves específicas do usuário
-      userDataKeys.forEach(key => {
-        localStorage.removeItem(key);
-      });
-      
-      // Apagar chaves com prefixos específicos
-      allKeys.forEach(key => {
-        if (prefixesToClear.some(prefix => key.startsWith(prefix))) {
-          localStorage.removeItem(key);
-        }
-      });
-      
+      localStorage.clear();
       toast({
         title: "Conta deletada",
         description: "Sua conta e todos os dados foram deletados permanentemente.",

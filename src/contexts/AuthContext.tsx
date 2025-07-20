@@ -1,22 +1,7 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { User as SupabaseUser } from '@supabase/supabase-js';
+import { User, AuthContextType, defaultUser } from '@/types/auth';
 import { UserProfile, defaultUserProfile } from '@/types/user';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, name: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  isAuthenticated: boolean;
-  loading: boolean;
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -30,132 +15,107 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar sessão atual do Supabase
-    const checkSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.user) {
-          await handleUserSession(session.user);
-        }
-      } catch (error) {
-        console.error('Erro ao verificar sessão:', error);
-      } finally {
-        setLoading(false);
+    // Inicializar usuário padrão se não existir
+    const users = JSON.parse(localStorage.getItem('chathy-users') || '[]');
+    if (users.length === 0) {
+      localStorage.setItem('chathy-users', JSON.stringify([defaultUser]));
+    }
+
+    // Verificar se há uma sessão ativa e se ainda é válida (24h)
+    const currentUser = localStorage.getItem('chathy-current-user');
+    const sessionExpiry = localStorage.getItem('chathy-session-expiry');
+    
+    if (currentUser && sessionExpiry) {
+      const now = new Date().getTime();
+      const expiryTime = parseInt(sessionExpiry);
+      
+      if (now < expiryTime) {
+        // Sessão ainda válida
+        const userData = JSON.parse(currentUser);
+        setUser(userData);
+        syncUserProfile(userData);
+      } else {
+        // Sessão expirada, limpar
+        localStorage.removeItem('chathy-current-user');
+        localStorage.removeItem('chathy-session-expiry');
       }
-    };
-
-    checkSession();
-
-    // Escutar mudanças de autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
-          await handleUserSession(session.user);
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-        }
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
+    }
   }, []);
 
-  const handleUserSession = async (supabaseUser: SupabaseUser) => {
-    try {
-      // Buscar ou criar perfil do usuário
-      let { data: profile, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', supabaseUser.id)
-        .single();
-
-      if (error && error.code === 'PGRST116') {
-        // Perfil não existe, criar um novo
-        const newProfile = {
-          user_id: supabaseUser.id,
-          name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'Usuário',
-          email: supabaseUser.email,
-          avatar: supabaseUser.user_metadata?.avatar_url || defaultUserProfile.avatar,
-          bio: defaultUserProfile.bio,
-          preferences: defaultUserProfile.preferences
-        };
-
-        const { data: createdProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert(newProfile)
-          .select()
-          .single();
-
-        if (createError) {
-          throw createError;
-        }
-
-        profile = createdProfile;
-      } else if (error) {
-        throw error;
-      }
-
-      setUser({
-        id: supabaseUser.id,
-        email: supabaseUser.email || '',
-        name: profile?.name || 'Usuário'
-      });
-    } catch (error) {
-      console.error('Erro ao processar sessão do usuário:', error);
+  const syncUserProfile = (userData: User) => {
+    const userProfileKey = `${userData.id}-user-profile`;
+    const existingProfile = JSON.parse(localStorage.getItem(userProfileKey) || 'null');
+    
+    // Se não há perfil ou o perfil não corresponde ao usuário logado, criar/atualizar
+    if (!existingProfile || existingProfile.email !== userData.email) {
+      const userProfile: UserProfile = {
+        ...defaultUserProfile,
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        updatedAt: new Date()
+      };
+      localStorage.setItem(userProfileKey, JSON.stringify(userProfile));
     }
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        console.error('Erro no login:', error);
-        return false;
-      }
-
+    const users: User[] = JSON.parse(localStorage.getItem('chathy-users') || '[]');
+    const foundUser = users.find(u => u.email === email && u.password === password && u.isActive);
+    
+    if (foundUser) {
+      setUser(foundUser);
+      localStorage.setItem('chathy-current-user', JSON.stringify(foundUser));
+      
+      // Definir expiração da sessão para 24 horas
+      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+      localStorage.setItem('chathy-session-expiry', expiryTime.toString());
+      
+      syncUserProfile(foundUser);
       return true;
-    } catch (error) {
-      console.error('Erro no login:', error);
-      return false;
     }
+    return false;
   };
 
   const register = async (email: string, name: string, password: string): Promise<boolean> => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name: name
-          }
-        }
-      });
-
-      if (error) {
-        console.error('Erro no registro:', error);
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Erro no registro:', error);
+    const users: User[] = JSON.parse(localStorage.getItem('chathy-users') || '[]');
+    
+    // Verificar se o email já existe
+    if (users.some(u => u.email === email)) {
       return false;
     }
+
+    const newUser: User = {
+      id: `user-${Date.now()}`,
+      email,
+      name,
+      password,
+      createdAt: new Date(),
+      isActive: true
+    };
+
+    users.push(newUser);
+    localStorage.setItem('chathy-users', JSON.stringify(users));
+    
+    setUser(newUser);
+    localStorage.setItem('chathy-current-user', JSON.stringify(newUser));
+    
+    // Definir expiração da sessão para 24 horas
+    const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+    localStorage.setItem('chathy-session-expiry', expiryTime.toString());
+    
+    syncUserProfile(newUser);
+    return true;
   };
 
   const logout = () => {
-    supabase.auth.signOut();
     setUser(null);
+    localStorage.removeItem('chathy-current-user');
+    localStorage.removeItem('chathy-session-expiry');
+    // Os dados específicos do usuário permanecem no localStorage para quando ele logar novamente
+    // O novo hook useUserStorage irá carregar os dados corretos automaticamente
   };
 
   const value: AuthContextType = {
@@ -163,8 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     register,
     logout,
-    isAuthenticated: !!user,
-    loading
+    isAuthenticated: !!user
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

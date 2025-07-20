@@ -52,38 +52,12 @@ export const SystemSettings = () => {
   };
 
   const handleResetLocalStorage = () => {
-    if (confirm('⚠️ ATENÇÃO: Esta ação irá apagar dados do usuário (agentes personalizados, conversas, configurações). Esta ação não pode ser desfeita. Tem certeza que deseja continuar?')) {
-      if (confirm('Esta é sua última chance! Confirma que deseja resetar os dados do usuário?')) {
-        // Lista de chaves específicas do usuário que podem ser apagadas com segurança
-        const userDataKeys = [
-          'agents',
-          'groups', 
-          'user-profile',
-          'agent-interactions',
-          'consultation-protocols'
-        ];
-        
-        // Apagar chaves que começam com prefixos específicos
-        const prefixesToClear = ['chat-history-', 'group-chat-'];
-        
-        // Obter todas as chaves do localStorage
-        const allKeys = Object.keys(localStorage);
-        
-        // Apagar apenas chaves específicas do usuário
-        userDataKeys.forEach(key => {
-          localStorage.removeItem(key);
-        });
-        
-        // Apagar chaves com prefixos específicos
-        allKeys.forEach(key => {
-          if (prefixesToClear.some(prefix => key.startsWith(prefix))) {
-            localStorage.removeItem(key);
-          }
-        });
-        
+    if (confirm('⚠️ ATENÇÃO: Esta ação irá apagar TODOS os dados locais (agentes personalizados, conversas, configurações). Esta ação não pode ser desfeita. Tem certeza que deseja continuar?')) {
+      if (confirm('Esta é sua última chance! Confirma que deseja resetar TODOS os dados do usuário?')) {
+        localStorage.clear();
         toast({
-          title: "Dados do Usuário Apagados",
-          description: "Dados pessoais foram removidos. A página será recarregada.",
+          title: "Dados Apagados",
+          description: "Todos os dados foram removidos. A página será recarregada.",
         });
         setTimeout(() => {
           window.location.reload();
