@@ -102,10 +102,26 @@ export const AdminPanel = () => {
   };
 
   const handleResetLocalStorage = () => {
-    if (confirm('⚠️ ATENÇÃO: Esta ação irá apagar TODOS os dados locais (agentes personalizados, conversas, configurações). Esta ação não pode ser desfeita. Tem certeza que deseja continuar?')) {
-      if (confirm('Esta é sua última chance! Confirma que deseja resetar TODOS os dados do usuário?')) {
-        localStorage.clear();
-        alert('Todos os dados foram apagados. A página será recarregada.');
+    if (confirm('⚠️ ATENÇÃO: Esta ação irá apagar dados específicos do usuário (agentes personalizados, conversas, configurações). Esta ação não pode ser desfeita. Tem certeza que deseja continuar?')) {
+      if (confirm('Esta é sua última chance! Confirma que deseja resetar os dados do usuário?')) {
+        // Limpar apenas dados específicos do usuário, não tudo
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (
+            key.includes('agents') ||
+            key.includes('chat-history') ||
+            key.includes('groups') ||
+            key.includes('user-profile') ||
+            key.includes('consultation-protocols') ||
+            key.includes('agent-interactions')
+          )) {
+            keysToRemove.push(key);
+          }
+        }
+        
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        alert('Dados do usuário foram apagados. A página será recarregada.');
         window.location.reload();
       }
     }

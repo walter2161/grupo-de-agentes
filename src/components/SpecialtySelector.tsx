@@ -68,7 +68,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Selecione uma especialidade" />
       </SelectTrigger>
-      <SelectContent className="max-h-60 overflow-y-auto">
+      <SelectContent className="max-h-80 overflow-y-auto">
         {specialties.map((specialty) => (
           <SelectItem key={specialty} value={specialty}>
             {specialty}

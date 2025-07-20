@@ -205,7 +205,7 @@ PAINEL ADMIN:
     personaStyle: 'Dinâmica, objetiva e orientada a resultados',
     documentation: 'Especialista em SEO, Google Ads, Facebook Ads, Analytics e automação de marketing',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face'
   },
   {
     id: 'gestor-trafego',
@@ -227,7 +227,7 @@ PAINEL ADMIN:
     personaStyle: 'Analítico, detalhista e orientado a performance',
     documentation: 'Expert em Google Ads, Meta Ads, LinkedIn Ads, análise de dados e otimização de campanhas',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face'
   },
   {
     id: 'social-media',
@@ -249,7 +249,7 @@ PAINEL ADMIN:
     personaStyle: 'Criativa, empática e conectada com tendências',
     documentation: 'Especialista em Instagram, TikTok, LinkedIn, YouTube, criação de conteúdo e community management',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face'
   },
   {
     id: 'designer-grafico',
@@ -271,7 +271,7 @@ PAINEL ADMIN:
     personaStyle: 'Criativo, detalhista e visual',
     documentation: 'Expert em Adobe Creative Suite, Figma, branding, UI/UX e design para impressão e digital',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
   },
   {
     id: 'financeiro',
@@ -293,7 +293,7 @@ PAINEL ADMIN:
     personaStyle: 'Prudente, educativa e orientada a objetivos',
     documentation: 'Especialista em planejamento financeiro, investimentos, análise de risco e educação financeira',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face'
   },
   {
     id: 'contador',
@@ -315,7 +315,7 @@ PAINEL ADMIN:
     personaStyle: 'Preciso, meticuloso e confiável',
     documentation: 'Expert em contabilidade empresarial, tributos, legislação fiscal e compliance',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face'
   },
   {
     id: 'advogado',
@@ -337,7 +337,7 @@ PAINEL ADMIN:
     personaStyle: 'Cuidadosa, didática e preventiva',
     documentation: 'Especialista em direito empresarial, contratos, trabalhista e consultoria preventiva',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=face'
   },
   {
     id: 'psicologo',
@@ -359,7 +359,7 @@ PAINEL ADMIN:
     personaStyle: 'Empático, acolhedor e profissional',
     documentation: 'Especialista em ansiedade, depressão, relacionamentos e desenvolvimento pessoal',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face'
   },
   {
     id: 'humorista',
@@ -381,7 +381,7 @@ PAINEL ADMIN:
     personaStyle: 'Divertido, criativo e positivo',
     documentation: 'Expert em stand-up comedy, criação de roteiros humorísticos e entretenimento',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=400&h=400&fit=crop&crop=face'
   },
   {
     id: 'prof-portugues',
@@ -403,7 +403,7 @@ PAINEL ADMIN:
     personaStyle: 'Didática, paciente e encorajadora',
     documentation: 'Especialista em gramática, redação, literatura brasileira e comunicação escrita',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face'
   },
   {
     id: 'prof-matematica',
@@ -426,6 +426,6 @@ PAINEL ADMIN:
     personaStyle: 'Lógico, paciente, didático e encorajador',
     documentation: 'Especialista em álgebra, geometria, trigonometria, cálculo e estatística básica',
     isActive: true,
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face'
   }
 ];
