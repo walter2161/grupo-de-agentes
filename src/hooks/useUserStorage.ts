@@ -1,3 +1,4 @@
+import React from 'react';
 import { useSupabaseStorage } from './useSupabaseStorage';
 import { Agent } from '@/types/agents';
 import { Group } from '@/types/groups';
