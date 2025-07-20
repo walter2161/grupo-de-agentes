@@ -100,7 +100,7 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply text-foreground;
+    @apply bg-background text-foreground;
     position: relative;
   }
 
