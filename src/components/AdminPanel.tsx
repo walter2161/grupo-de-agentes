@@ -57,7 +57,7 @@ export const AdminPanel = () => {
       id: `agent-${Date.now()}`,
       name: 'Novo Agente',
       title: 'Especialista',
-      specialty: 'Psicologia Clínica',
+      specialty: 'Médico',
       description: 'Descrição do novo agente',
       icon: 'User',
       color: 'from-blue-500 to-cyan-500',
@@ -289,12 +289,12 @@ export const AdminPanel = () => {
                   </div>
                   
                    <div>
-                     <label className="block text-sm font-medium text-foreground mb-1">Especialidade</label>
+                     <label className="block text-sm font-medium text-foreground mb-1">Profissão</label>
                      <SpecialtySelector
-                       selectedSpecialty={selectedAgent.specialty}
-                       onSpecialtySelect={(specialty) => {
-                         const generatedContent = generateAgentContent(specialty, selectedAgent);
-                         setSelectedAgent({ ...selectedAgent, specialty, ...generatedContent });
+                       selectedProfession={selectedAgent.specialty}
+                       onProfessionSelect={(profession) => {
+                         const generatedContent = generateAgentContent(profession, selectedAgent);
+                         setSelectedAgent({ ...selectedAgent, specialty: profession, ...generatedContent });
                        }}
                      />
                    </div>

@@ -2,86 +2,67 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const specialties = [
-  'Marketing Digital',
-  'Gestão de Tráfego Pago', 
-  'Gestão de Redes Sociais',
-  'Design Gráfico e Visual',
-  'Planejamento Financeiro',
-  'Contabilidade e Tributação',
-  'Consultoria Jurídica',
-  'Psicologia Clínica',
-  'Humor e Entretenimento',
-  'Língua Portuguesa',
-  'Matemática',
-  'Programação e Desenvolvimento',
-  'Arquitetura e Design',
-  'Engenharia',
-  'Medicina',
-  'Enfermagem',
-  'Nutrição',
-  'Educação Física',
-  'Administração',
-  'Recursos Humanos',
-  'Vendas e Negociação',
-  'Consultoria Empresarial',
-  'Fotografia',
-  'Jornalismo',
-  'Tradução e Interpretação',
-  'Culinária',
-  'Música',
-  'Turismo',
-  'Veterinária',
-  'Farmácia',
-  'Mecânico Automotivo',
+const professions = [
+  'Médico',
+  'Enfermeiro',
+  'Professor',
+  'Engenheiro',
+  'Advogado',
+  'Contador',
+  'Psicólogo',
+  'Dentista',
+  'Farmacêutico',
+  'Veterinário',
+  'Arquiteto',
+  'Designer',
+  'Programador',
+  'Jornalista',
+  'Fotógrafo',
+  'Chef de Cozinha',
+  'Nutricionista',
+  'Fisioterapeuta',
+  'Personal Trainer',
+  'Vendedor',
+  'Administrador',
+  'Consultor',
+  'Músico',
+  'Artista',
+  'Mecânico',
   'Eletricista',
   'Encanador',
   'Carpinteiro',
-  'Pedreiro',
-  'Soldador',
-  'Técnico em Eletrônica',
-  'Técnico em Informática',
-  'Personagem Fictício',
-  'Cientista',
-  'Escritor',
-  'Filósofo',
-  'Artista',
-  'Cozinheiro',
-  'Aventureiro',
-  'Super-Herói',
-  'Desenho Animado',
-  'Celebridade',
-  'Histórico'
+  'Corretor de Imóveis',
+  'Motorista'
 ];
 
-interface SpecialtySelectorProps {
-  selectedSpecialty: string;
-  onSpecialtySelect: (specialty: string) => void;
+interface ProfessionSelectorProps {
+  selectedProfession: string;
+  onProfessionSelect: (profession: string) => void;
 }
 
-export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ 
-  selectedSpecialty, 
-  onSpecialtySelect 
+export const SpecialtySelector: React.FC<ProfessionSelectorProps> = ({ 
+  selectedProfession, 
+  onProfessionSelect 
 }) => {
   return (
     <Select 
-      value={selectedSpecialty} 
+      value={selectedProfession} 
       onValueChange={(value) => {
-        console.log('Specialty selected:', value);
-        onSpecialtySelect(value);
+        console.log('Profession selected:', value);
+        onProfessionSelect(value);
       }}
     >
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Selecione uma especialidade" />
+      <SelectTrigger className="w-full bg-background">
+        <SelectValue placeholder="Selecione uma profissão" />
       </SelectTrigger>
-      <SelectContent className="max-h-[400px] overflow-y-auto z-50">
-        {specialties.map((specialty, index) => (
+      <SelectContent className="max-h-[300px] overflow-y-auto z-50 bg-background border border-border">
+        {professions.map((profession, index) => (
           <SelectItem 
-            key={`${specialty}-${index}`} 
-            value={specialty}
-            className="cursor-pointer"
+            key={`profession-${index}`} 
+            value={profession}
+            className="cursor-pointer hover:bg-accent"
           >
-            {specialty}
+            {profession}
           </SelectItem>
         ))}
       </SelectContent>
