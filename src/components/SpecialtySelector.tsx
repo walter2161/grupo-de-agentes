@@ -52,15 +52,18 @@ export const SpecialtySelector: React.FC<ProfessionSelectorProps> = ({
         onProfessionSelect(value);
       }}
     >
-      <SelectTrigger className="w-full bg-background">
+      <SelectTrigger className="w-full bg-background text-foreground border-border">
         <SelectValue placeholder="Selecione uma profissão" />
       </SelectTrigger>
-      <SelectContent className="max-h-[300px] overflow-y-auto z-50 bg-background border border-border">
+      <SelectContent 
+        className="max-h-[300px] overflow-y-auto z-[100] bg-popover text-popover-foreground border border-border shadow-lg"
+        sideOffset={5}
+      >
         {professions.map((profession, index) => (
           <SelectItem 
             key={`profession-${index}`} 
             value={profession}
-            className="cursor-pointer hover:bg-accent"
+            className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
           >
             {profession}
           </SelectItem>
