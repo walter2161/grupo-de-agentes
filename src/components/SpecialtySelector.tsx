@@ -64,13 +64,23 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
   onSpecialtySelect 
 }) => {
   return (
-    <Select value={selectedSpecialty} onValueChange={onSpecialtySelect}>
+    <Select 
+      value={selectedSpecialty} 
+      onValueChange={(value) => {
+        console.log('Specialty selected:', value);
+        onSpecialtySelect(value);
+      }}
+    >
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Selecione uma especialidade" />
       </SelectTrigger>
-      <SelectContent className="max-h-80 overflow-y-auto">
-        {specialties.map((specialty) => (
-          <SelectItem key={specialty} value={specialty}>
+      <SelectContent className="max-h-[400px] overflow-y-auto z-50">
+        {specialties.map((specialty, index) => (
+          <SelectItem 
+            key={`${specialty}-${index}`} 
+            value={specialty}
+            className="cursor-pointer"
+          >
             {specialty}
           </SelectItem>
         ))}
