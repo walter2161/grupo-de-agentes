@@ -30,7 +30,7 @@ export function useUserStorage<T>(key: string, initialValue: T): [T, (value: T |
       // Se excedeu a quota, limpar dados antigos e tentar novamente
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
         try {
-          // Limpar dados antigos desnecessários
+          // Limpar dados antigos de forma mais agressiva
           const keysToRemove: string[] = [];
           for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
@@ -38,12 +38,27 @@ export function useUserStorage<T>(key: string, initialValue: T): [T, (value: T |
               key.includes('old-') || 
               key.includes('temp-') ||
               key.includes('cache-') ||
-              (key.includes('chat-history') && !key.includes(user?.id || ''))
+              key.includes('backup-') ||
+              key.includes('draft-') ||
+              key.includes('session-') ||
+              (key.includes('chat-history') && !key.includes(user?.id || '')) ||
+              (key.includes('messages') && !key.includes(user?.id || ''))
             )) {
               keysToRemove.push(key);
             }
           }
           
+          // Se não tem dados antigos para limpar, limpar dados de outros usuários (exceto o atual)
+          if (keysToRemove.length === 0) {
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i);
+              if (key && key.includes('-') && user?.id && !key.includes(user.id)) {
+                keysToRemove.push(key);
+              }
+            }
+          }
+          
+          console.log(`Clearing ${keysToRemove.length} keys to free up space`);
           keysToRemove.forEach(key => localStorage.removeItem(key));
           
           // Tentar salvar novamente
@@ -53,7 +68,37 @@ export function useUserStorage<T>(key: string, initialValue: T): [T, (value: T |
           console.log('Successfully saved after clearing old data');
         } catch (retryError) {
           console.error('Failed to save even after cleaning localStorage:', retryError);
-          alert('Armazenamento local cheio. Alguns dados podem não ser salvos. Considere limpar dados antigos.');
+          // Como último recurso, limpar tudo exceto dados essenciais do usuário atual
+          try {
+            const essentialKeys = [
+              `${user?.id}-user-profile`,
+              `${user?.id}-agents`
+            ];
+            const currentData: { [key: string]: string } = {};
+            
+            // Salvar dados essenciais temporariamente
+            essentialKeys.forEach(key => {
+              const data = localStorage.getItem(key);
+              if (data) currentData[key] = data;
+            });
+            
+            // Limpar tudo
+            localStorage.clear();
+            
+            // Restaurar dados essenciais
+            Object.entries(currentData).forEach(([key, data]) => {
+              localStorage.setItem(key, data);
+            });
+            
+            // Tentar salvar novamente
+            const valueToStore = value instanceof Function ? value(storedValue) : value;
+            const finalJsonString = JSON.stringify(valueToStore);
+            window.localStorage.setItem(userKey, finalJsonString);
+            console.log('Successfully saved after emergency cleanup');
+          } catch (finalError) {
+            console.error('Complete localStorage failure:', finalError);
+            alert('Erro crítico de armazenamento. Recarregue a página e tente novamente.');
+          }
         }
       }
     }

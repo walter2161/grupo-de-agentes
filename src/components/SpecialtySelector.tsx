@@ -52,7 +52,7 @@ const specialties = [
   'Desenho Animado',
   'Celebridade',
   'Histórico'
-] as const;
+];
 
 interface SpecialtySelectorProps {
   selectedSpecialty: string;
