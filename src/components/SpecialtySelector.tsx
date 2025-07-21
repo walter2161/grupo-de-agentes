@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const specialties = [
   'Marketing Digital',
-  'Gestão de Tráfego Pago',
+  'Gestão de Tráfego Pago', 
   'Gestão de Redes Sociais',
   'Design Gráfico e Visual',
   'Planejamento Financeiro',
@@ -52,7 +52,7 @@ const specialties = [
   'Desenho Animado',
   'Celebridade',
   'Histórico'
-];
+] as const;
 
 interface SpecialtySelectorProps {
   selectedSpecialty: string;
